@@ -215,6 +215,8 @@ Ext.define('BDC.view.View', {
         memoryPanel = this.getComponent('memoryPanel');
         registersPanel = this.getComponent('registersPanel');
 
+        this.reset();
+
         registersPanel.setACCN(program[n++]);
         registersPanel.setPCN(program[n++]);
         registersPanel.setIRN(program[n++]);
