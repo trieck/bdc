@@ -5,14 +5,14 @@ Ext.define('BDC.lib.ButtonsPanel', {
         type: 'vbox',
         align: 'center'
     },
-    columnWidth: .2,
+    columnWidth: 0.2,
     height: 350,
     title: 'Options',
     padding: '10px',
     items: [
         {
             xtype: 'component',
-            flex: .5
+            flex: 0.5
         },
         {
             xtype: 'button',
@@ -23,11 +23,11 @@ Ext.define('BDC.lib.ButtonsPanel', {
             iconCls: 'step-icon',
             iconAlign: 'top',
             width: '80%',
-            flex: .6
+            flex: 0.6
         },
         {
             xtype: 'component',
-            flex: .5
+            flex: 0.5
         },
         {
             xtype: 'button',
@@ -38,27 +38,27 @@ Ext.define('BDC.lib.ButtonsPanel', {
             iconCls: 'reset-icon',
             iconAlign: 'top',
             width: '80%',
-            flex: .6
+            flex: 0.6
         },
         {
             xtype: 'component',
-            flex: .5
+            flex: 0.5
         },
         {
             xtype: 'button',
             tooltip: { text: 'Save the machine state' },
             text: 'SAVE',
-            disabled: false,
+            disabled: true,
             focusCls: '',
             id: 'saveButton',
             iconCls: 'save-icon',
             iconAlign: 'top',
             width: '80%',
-            flex: .6
+            flex: 0.6
         },
         {
             xtype: 'component',
-            flex: .10
+            flex: 0.10
         },
         {
             xtype: 'button',
@@ -69,7 +69,7 @@ Ext.define('BDC.lib.ButtonsPanel', {
             iconCls: 'load-icon',
             iconAlign: 'top',
             width: '80%',
-            flex: .6,
+            flex: 0.6,
             menu: {
                 items: [
                     {

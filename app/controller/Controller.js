@@ -12,6 +12,9 @@ Ext.define('BDC.controller.Controller', {
             },
             '#resetButton': {
                 click: this.onReset
+            },
+            '#stepButton': {
+                click: this.onStep
             }
         });
     },
@@ -23,5 +26,10 @@ Ext.define('BDC.controller.Controller', {
     onReset: function () {
         var view = this.getBDCView();
         view.reset();
+    },
+
+    onStep: function() {
+        var view = this.getBDCView();
+        view.step();
     }
 });

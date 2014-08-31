@@ -2,16 +2,14 @@ Ext.define('BDC.lib.MemoryPanel', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.memory-panel',
     title: 'Main Memory',
-    columnWidth: .6,
+    uses: [ 'BDC.lib.Colors'],
+    columnWidth: 0.6,
     height: 350,
     layout: {
         type: 'table',
         columns: 11
     },
     padding: '10px',
-    statics: {
-        MAGENTA: 'FF00FF'
-    },
 
     initComponent: function () {
         var i, j;
@@ -47,7 +45,7 @@ Ext.define('BDC.lib.MemoryPanel', {
             this.add({
                 xtype: 'textfield',
                 minLength: 1,
-                maxLength: 3,
+                maxLength: 1,
                 fieldCls: 'memory-cell',
                 selectOnFocus: true,
                 emptyText: '0',
@@ -58,14 +56,24 @@ Ext.define('BDC.lib.MemoryPanel', {
         }
     },
 
+    getMemoryCells: function () {
+        return this.query('textfield[itemId^=memory-cell]');
+    },
+
     clear: function () {
-        var items = this.query('textfield[itemId^=memory-cell]');
-        Ext.each(items, function (item) {
-            item.reset();
-            item.setFieldStyle('color: darkgrey;');
-            item.setValue('0');
+        var cells = this.getMemoryCells();
+        Ext.each(cells, function (cell) {
+            cell.reset();
+            cell.setFieldStyle('color: darkgrey;');
+            cell.setValue('0');
         });
-        this.highlightInstruction(0, this.self.MAGENTA);
+        this.highlightInstruction(0, BDC.lib.Colors.MAGENTA);
+    },
+
+    getCell: function (i, j) {
+        var index = i * 10 + j;
+        var id = Ext.String.format('memory-cell-{0}', index);
+        return this.getComponent(id);
     },
 
     highlightInstruction: function (pc, color) {
@@ -89,12 +97,40 @@ Ext.define('BDC.lib.MemoryPanel', {
     },
 
     highlight: function (i, j, color) {
-        var index = i * 10 + j;
-        var id = Ext.String.format('memory-cell-{0}', index);
-        var component = this.getComponent(id);
+        var cell = this.getCell(i, j);
         var style = Ext.String.format('color: #{0};', color);
+        cell.setFieldStyle(style);
+    },
 
-        component.setFieldStyle(style);
+    resetGray: function () {
+        var cells = this.getMemoryCells();
+        Ext.each(cells, function (cell) {
+            cell.setFieldStyle('color: darkgrey;');
+        });
+    },
+
+    getCellValue: function (i, j) {
+        var cell = this.getCell(i, j);
+        return cell.getValue() % 10;
+    },
+
+    getNCellValue: function (n) {
+        var i, j;
+        i = Math.floor(n / 10) % 10;
+        j = n % 10;
+        return this.getCellValue(i, j);
+    },
+
+    setCellValue: function (i, j, value) {
+        var cell = this.getCell(i, j);
+        cell.setValue(value % 10);
+    },
+
+    setNCellValue: function (n, value) {
+        var i, j;
+        i = Math.floor(n / 10) % 10;
+        j = n % 10;
+        this.setCellValue(i, j, value);
     }
 });
 
