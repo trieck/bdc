@@ -1,0 +1,71 @@
+{
+    "projectName": "Basic Decimal Computer",
+    "licenseText": "Copyright(c) 2012 Michael Q. Rieck, Thomas A. Rieck",
+    "builds": [
+        {
+            "name": "All Classes",
+            "target": "all-classes.js",
+            "options": {
+                "debug": true
+            },
+            "files": [
+                {
+                    "clsName": "BDC.lib.ButtonsPanel",
+                    "name": "ButtonsPanel.js",
+                    "path": "app/lib/"
+                },
+                {
+                    "clsName": "BDC.lib.MemoryPanel",
+                    "name": "MemoryPanel.js",
+                    "path": "app/lib/"
+                },
+                {
+                    "clsName": "BDC.lib.RegistersPanel",
+                    "name": "RegistersPanel.js",
+                    "path": "app/lib/"
+                },
+                {
+                    "clsName": "BDC.view.View",
+                    "name": "View.js",
+                    "path": "app/view/"
+                },
+                {
+                    "clsName": "BDC.controller.Controller",
+                    "name": "Controller.js",
+                    "path": "app/controller/"
+                },
+                {
+                    "clsName": "BDC.lib.Colors",
+                    "name": "Colors.js",
+                    "path": "app/lib/"
+                },
+                {
+                    "clsName": "BDC.lib.Programs",
+                    "name": "Programs.js",
+                    "path": "app/lib/"
+                },
+                {
+                    "clsName": "BDC.lib.Frame",
+                    "name": "Frame.js",
+                    "path": "app/lib/"
+                }
+            ]
+        },
+        {
+            "name": "Application - Production",
+            "target": "app-all.js",
+            "compress": true,
+            "files": [
+                {
+                    "path": "",
+                    "name": "all-classes.js"
+                },
+                {
+                    "path": "",
+                    "name": "app.js"
+                }
+            ]
+        }
+    ],
+    "resources": []
+}
