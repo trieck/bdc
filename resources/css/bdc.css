@@ -1,0 +1,32 @@
+.load-icon {
+    background-image: url(../images/load.png) !important;
+}
+
+.memory-bold-cell {
+    font-family: "Menlo", "Courier New", "Courier", monospace;
+    font-weight: 900;
+    text-align: center;
+    border: none;
+}
+
+.memory-cell {
+    font-family: "Menlo", "Courier New", "Courier", monospace;
+    text-align: center;
+    border: none;
+}
+
+.reset-icon {
+    background-image: url(../images/reset.png) !important;
+}
+
+.save-icon {
+    background-image: url(../images/save.png) !important;
+}
+
+.step-icon {
+    background-image: url(../images/step.png) !important;
+}
+
+.tape-icon {
+    background-image: url(../images/tape.png) !important;
+}
