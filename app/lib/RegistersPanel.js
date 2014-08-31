@@ -153,6 +153,15 @@ Ext.define('BDC.lib.RegistersPanel', {
         ir.setValue('' + this.ir2 + '' + this.ir1 + '' + this.ir0);
     },
 
+    setIRN: function (n) {
+        var x, y, z;
+        x = Math.floor(n / 100) % 10;
+        n = n % 100;
+        y = Math.floor(n / 10);
+        z = n % 10;
+        this.setIRXYZ(x, y, z);
+    },
+
     setStrings: function () {
         var component = this.getComponent('ACC');
         component.setValue('' + this.ac1 + '' + this.ac0);

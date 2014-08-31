@@ -175,8 +175,8 @@ Ext.define('BDC.view.View', {
                 if (xy !== 0) {
                     cell1_ = Math.floor(value_ / 10);
                     cell0_ = value_ % 10;
-                    memoryPanel.setCellValue(xy_, cell0_);
-                    memoryPanel.setCellValue((xy_ + 1) % 100, cell1_);
+                    memoryPanel.setNCellValue(xy_, cell0_);
+                    memoryPanel.setNCellValue((xy_ + 1) % 100, cell1_);
                 } else {
                     registersPanel.setACCN(value_);
                 }
@@ -187,8 +187,8 @@ Ext.define('BDC.view.View', {
                 if (xy !== 0) {
                     cell1_ = Math.floor(value_ / 10);
                     cell0_ = value_ % 10;
-                    memoryPanel.setCellValue(xy_, cell0_);
-                    memoryPanel.setCellValue((xy_ + 1) % 100, cell1_);
+                    memoryPanel.setNCellValue(xy_, cell0_);
+                    memoryPanel.setNCellValue((xy_ + 1) % 100, cell1_);
                 } else {
                     registersPanel.setACCN(value_);
                 }
@@ -204,6 +204,28 @@ Ext.define('BDC.view.View', {
             }
         }
 
+        pc0 = registersPanel.pc0;
+        pc1 = registersPanel.pc1;
+        pc = pc0 + 10 * pc1;
+        this.highlightInstruction(pc, BDC.lib.Colors.MAGENTA);
+    },
+
+    loadProgram: function (program) {
+        var memoryPanel, registersPanel, i, j, n = 0, pc0, pc1, pc;
+        memoryPanel = this.getComponent('memoryPanel');
+        registersPanel = this.getComponent('registersPanel');
+
+        registersPanel.setACCN(program[n++]);
+        registersPanel.setPCN(program[n++]);
+        registersPanel.setIRN(program[n++]);
+
+        for (i = 0; i < 10; i++) {
+            for (j = 0; j < 10; j++) {
+                memoryPanel.setCellValue(i, j, program[n++]);
+            }
+        }
+
+        registersPanel.setAll();
         pc0 = registersPanel.pc0;
         pc1 = registersPanel.pc1;
         pc = pc0 + 10 * pc1;

@@ -74,26 +74,32 @@ Ext.define('BDC.lib.ButtonsPanel', {
                 items: [
                     {
                         text: 'Multiply x and y',
+                        id: 'programOne',
                         iconCls: 'tape-icon'
                     },
                     {
                         text: 'Divide x by y',
+                        id: 'programTwo',
                         iconCls: 'tape-icon'
                     },
                     {
                         text: 'Add numbers from x up to y',
+                        id: 'programThree',
                         iconCls: 'tape-icon'
                     },
                     {
                         text: 'Generate Fibonacci numbers',
+                        id: 'programFour',
                         iconCls: 'tape-icon'
                     },
                     {
                         text: 'Compute base-2 Logarithm of x',
+                        id: 'programFive',
                         iconCls: 'tape-icon'
                     },
                     {
                         text: 'Add data in array',
+                        id: 'programSix',
                         iconCls: 'tape-icon'
                     }
                 ]

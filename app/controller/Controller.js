@@ -1,5 +1,6 @@
 Ext.define('BDC.controller.Controller', {
     extend: 'Ext.app.Controller',
+    uses: ['BDC.lib.Programs'],
     views: [ 'BDC.view.View' ],
     refs: [
         { selector: 'bdc-view', ref: 'BDCView' }
@@ -15,6 +16,24 @@ Ext.define('BDC.controller.Controller', {
             },
             '#stepButton': {
                 click: this.onStep
+            },
+            '#programOne': {
+                click: this.onProgramOne
+            },
+            '#programTwo': {
+                click: this.onProgramTwo
+            },
+            '#programThree': {
+                click: this.onProgramThree
+            },
+            '#programFour': {
+                click: this.onProgramFour
+            },
+            '#programFive': {
+                click: this.onProgramFive
+            },
+            '#programSix': {
+                click: this.onProgramSix
             }
         });
     },
@@ -28,8 +47,32 @@ Ext.define('BDC.controller.Controller', {
         view.reset();
     },
 
-    onStep: function() {
+    onStep: function () {
         var view = this.getBDCView();
         view.step();
+    },
+    onProgramOne: function () {
+        var view = this.getBDCView();
+        view.loadProgram(BDC.lib.Programs.PROGRAM_ONE);
+    },
+    onProgramTwo: function () {
+        var view = this.getBDCView();
+        view.loadProgram(BDC.lib.Programs.PROGRAM_TWO);
+    },
+    onProgramThree: function () {
+        var view = this.getBDCView();
+        view.loadProgram(BDC.lib.Programs.PROGRAM_THREE);
+    },
+    onProgramFour: function () {
+        var view = this.getBDCView();
+        view.loadProgram(BDC.lib.Programs.PROGRAM_FOUR);
+    },
+    onProgramFive: function () {
+        var view = this.getBDCView();
+        view.loadProgram(BDC.lib.Programs.PROGRAM_FIVE);
+    },
+    onProgramSix: function () {
+        var view = this.getBDCView();
+        view.loadProgram(BDC.lib.Programs.PROGRAM_SIX);
     }
 });

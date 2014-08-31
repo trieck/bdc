@@ -71,7 +71,7 @@ Ext.define('BDC.lib.MemoryPanel', {
     },
 
     getCell: function (i, j) {
-        var index = i * 10 + j;
+        var index = (i % 10) * 10 + (j % 10);
         var id = Ext.String.format('memory-cell-{0}', index);
         return this.getComponent(id);
     },
