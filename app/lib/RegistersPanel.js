@@ -45,5 +45,17 @@ Ext.define('BDC.lib.RegistersPanel', {
             emptyText: '000',
             width: 75
         }
-    ]
+    ],
+
+    clear: function () {
+        var component = this.getComponent('ACC');
+        component.reset();
+
+        component = this.getComponent('PC');
+        component.reset();
+
+        component = this.getComponent('IR');
+        component.reset();
+
+    }
 });

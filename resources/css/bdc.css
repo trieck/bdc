@@ -11,6 +11,7 @@
 
 .memory-cell {
     font-family: "Menlo", "Courier New", "Courier", monospace;
+    color: darkgrey;
     text-align: center;
     border: none;
 }

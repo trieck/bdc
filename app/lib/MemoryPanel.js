@@ -9,6 +9,9 @@ Ext.define('BDC.lib.MemoryPanel', {
         columns: 11
     },
     padding: '10px',
+    statics: {
+        MAGENTA: 'FF00FF'
+    },
 
     initComponent: function () {
         var i, j;
@@ -49,9 +52,49 @@ Ext.define('BDC.lib.MemoryPanel', {
                 selectOnFocus: true,
                 emptyText: '0',
                 width: 25,
+                itemId: 'memory-cell-' + i,
                 margin: '2px'
             });
         }
+    },
+
+    clear: function () {
+        var items = this.query('textfield[itemId^=memory-cell]');
+        Ext.each(items, function (item) {
+            item.reset();
+            item.setFieldStyle('color: darkgrey;');
+            item.setValue('0');
+        });
+        this.highlightInstruction(0, this.self.MAGENTA);
+    },
+
+    highlightInstruction: function (pc, color) {
+        var pc0, pc1;
+        pc1 = Math.floor(pc / 10);
+        pc0 = pc % 10;
+
+        this.highlight(pc1, pc0, color);
+
+        pc = (pc + 1) % 100;
+        pc1 = Math.floor(pc / 10);
+        pc0 = pc % 10;
+
+        this.highlight(pc1, pc0, color);
+
+        pc = (pc + 1) % 100;
+        pc1 = Math.floor(pc / 10);
+        pc0 = pc % 10;
+
+        this.highlight(pc1, pc0, color);
+    },
+
+    highlight: function (i, j, color) {
+        var index = i * 10 + j;
+        var id = Ext.String.format('memory-cell-{0}', index);
+        var component = this.getComponent(id);
+        var style = Ext.String.format('color: #{0};', color);
+
+        component.setFieldStyle(style);
     }
 });
 

@@ -6,5 +6,11 @@ Ext.define('BDC.lib.Frame', {
     items: [
         { xtype: 'bdc-view' }
     ],
-    resizable: false
+    resizable: false,
+
+    initComponent: function () {
+        Ext.QuickTips.init();
+        Ext.tip.Tip.prototype.minWidth = 200;
+        this.callParent(arguments);
+    }
 });

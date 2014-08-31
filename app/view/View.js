@@ -13,10 +13,20 @@ Ext.define('BDC.view.View', {
             xtype: 'buttons-panel'
         },
         {
-            xtype: 'memory-panel'
+            xtype: 'memory-panel',
+            itemId: 'memoryPanel'
         },
         {
-            xtype: 'registers-panel'
+            xtype: 'registers-panel',
+            itemId: 'registersPanel'
         }
-    ]
+    ],
+
+    reset: function () {
+        var panel = this.getComponent('memoryPanel');
+        panel.clear();
+
+        panel = this.getComponent('registersPanel');
+        panel.clear();
+    }
 });
