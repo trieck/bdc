@@ -1,5 +1,5 @@
 /*
-Copyright(c) 2012 Michael Q. Rieck, Thomas A. Rieck
+Copyright(c) 2014 Michael Q. Rieck, Thomas A. Rieck
 */
 Ext.define('BDC.lib.ButtonsPanel', {
     extend: 'Ext.panel.Panel',
@@ -828,14 +828,17 @@ Ext.define('BDC.lib.Programs', {
     }
 });
 Ext.define('BDC.lib.Frame', {
-    extend: 'Ext.window.Window',
+    extend: 'Ext.panel.Panel',
     alias: 'bdc-frame',
     closable: false,
     title: 'Basic Decimal Computer',
+    renderTo: 'bdc-app',
+    width: 665,
+    height: 375,
+    layout: 'fit',
     items: [
         { xtype: 'bdc-view' }
     ],
-    resizable: false,
 
     initComponent: function () {
         Ext.QuickTips.init();

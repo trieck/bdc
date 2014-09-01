@@ -1,6 +1,139 @@
-<link rel="stylesheet" type="text/css" href="ext-4/resources/css/ext-all.css"/>
-<link rel="stylesheet" type="text/css" href="resources/css/bdc.css"/>
-<script type="text/javascript" src="ext-4/ext-all.js"></script>
-<script type="text/javascript" src="app-all.js"></script>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="ext-4/resources/css/ext-all.css"/>
+    <link rel="stylesheet" type="text/css" href="resources/css/bdc.css"/>
+    <script type="text/javascript" src="ext-4/ext-all.js"></script>
+    <script type="text/javascript" src="app-all.js"></script>
+</head>
+<body bgcolor="#B0E0F0" link="black" vlink="black" alink="black"><br/><br/><br/><br/><br/><br/>
+<center><font color="#FF4020"><h1>Basic Decimal Computer</h1>
 
-
+    <h3>M. Q. Rieck</h3></font><br/> <img src="resources/images/bdc.jpg" width=280/></center>
+<br/><br/><br/><br/><br/><h4>The BDC</h4> The BDC is an imaginary computer system intended as a teaching aid, to
+introduce the basics of digital computer organization. Its computations are based on the decimal number system, rather
+than binary, for easier comprehension. Nevertheless, it exhibits many features common to actual computers. <br/><br/>
+Following the <font color="#D07070"><i>Von Neumann Model,</i></font> used in nearly all modern computers, <font
+        color="#D07070"><i>main memory</i></font> holds both numeric data and encoded <font color="#D07070"><i>machine
+    instructions</i></font> telling the computer how to manipulate the data. Each of one hundred <font
+        color="#D07070"><i>memory cells</i></font> (in main memory) contains a <i>single</i> decimal digit, which can be
+changed. Also, each cell is uniquely identified via its (unchangable) 2-digit <font color="#D07070"><i>memory
+    adderss.</i></font> These addresses range from <tt>00</tt> to <tt>99</tt>. The BDC uses the standard <font
+        color="#D07070"><i>little-endian</i></font> convention. This means that whenever a multi-digit value is stored
+in main memory, its digits are stored in consecutive memory cells, <i>beginning with the least significant digit</i>.
+For example, if the number thirteen (13) was stored beginning at memory address ninety-six (96), then the cell whose
+address is 96 would hold the digit 3, and the cell whose address is 97 would hold the digit 1. <br/><br/>There are only
+three <font color="#D07070"><i>CPU registers,</i></font> which hold multi-digit values, as follows:
+<ul>
+    <li> The <font color="#D07070"><i>accumulator</i></font> (A) contains two digits. It is used to hold and manipulate
+        data during a computation.
+    <li> The <font color="#D07070"><i>program counter</i></font> (PC) contains two digits. It is used to remember the
+        main memory <i>address</i> where the <i>next</i> machine instruction (to be fetched and executed) begins.
+    <li> The <font color="#D07070"><i>instruction register</i></font> (IR) contains three digits. It holds a copy of the
+        machine instruction currently being examined and executed.
+</ul>
+All machine instructions are three digits long. These instructions and their purposes are as follows:
+<pre>Inst.  Meaning  <br>-----  -------  <br> 000   Halt. (Terminate program.)  <br> 0??   Branch by an amount ??, by adding the number ?? to PC (?? != 0).   <br> 1??   Same as 0?? but only branch if most recent add/subtract caused overflow.  <br> 2??   Same as 0?? but only branch if most recent add/subtract did not cause overflow.  <br> 3??   Put the actual number ?? into A.  <br> 4??   Copy 2-digit value from main memory into A, starting at memory address ??.   <br> 5??   Add 2-digit value starting at memory address ??, to A.   <br> 6??   Subtract 2-digit value starting at memory address ??, from A.  <br> 7??   Copy 2-digit value from A into main memory, starting at memory address ??.   <br> 8??   Increment 2-digit value starting at memory address ??.   <br> 9??   Decrement 2-digit value starting at memory address ??.  <br></pre>
+Addition and subtraction are always performed <font color="#D07070"><i>modulo-one-hundred</i></font>. This means that
+some multiple of one hundred might need to be added to or subtracted from the answer, so as to force it to be between 0
+and 99. Thus two digits always suffice to hold the result. For example, 25 + 88 yields 13, since 113 is converted to 13.
+So if 88 is stored in main memory, beginning at address <tt>54</tt>, and if 25 is stored in A, then the instruction <tt>554</tt>
+would cause the value in A to become 13. As another example, if 88 is stored in main memory, beginning at address
+<tt>54</tt>, and if 25 is stored in A, then the instruction <tt>654</tt> would cause the value in A to become 37,
+because 25 - 88 = -63, but -63 would be converted to 37 (= -63 + 100). Whenever addition or subtraction requires this
+sort of adjustment, either because adding two numbers would ordinarily be bigger that 99, or because subtracting two
+numbers would ordinarily be negative, we say that an <font color="#D07070"><i>overflow</i></font> has occurred.
+<br/><br/> Concerning memory addresses, the instruction descriptions in the above table are not exactly correct. The
+phrase 'memory address <tt>??</tt>' occurs in the descriptions of instructions <tt>4??</tt> through <tt>9??</tt>.
+However (<i>watch out!</i>), whenever <tt>??</tt> is <tt>00</tt> in these instructions, instead of using the main memory
+cells whose addresses are <tt>00</tt> and <tt>01</tt>, the accumulator (A) is used. For example, the instruction
+<tt>800</tt> increments the accumulator. Moreover, when the first digit in <tt>??</tt> is zero, but the second digit is
+nonzero, <font color="#D07070"><i>indirect addressing</i></font> is used instead. This is explained later, but it might
+be better to ignore indirect addressing at least until after you gain a mastery of the more basic aspects of the BDC.
+<br/><br/>Consecutive machine instructions are stored in main memory, to form a <font
+        color="#D07070"><i>program.</i></font> In this way, the BDC can be directed to perform a task, in a step-by-step
+manner. Each instruction occupies three consecutive cells. The machine instructions are ordinarily executed in the order
+in which they are placed into main memory. Technically this happens because, each time an instruction is fetched, PC is
+automatically updated by increasing it by three. Remember that PC keeps track of where in memory to find the next
+instruction to be executed. <br/><br/>However, instructions that begin with <tt>0</tt>, <tt>1</tt> or <tt>2</tt> can
+alter this basic flow. They can cause additional updates of PC, thus affecting where to find the next instruction. An
+instruction beginning with <tt>0</tt> (other than <tt>000</tt>) can add any number to PC (modulo 100). This can be used
+to <font color="#D07070"><i>branch</i></font> (jump) forward or backward, because of addition modulo one hundred. For
+instance, <tt>088</tt> means to branch forward by 88 cells. But, because of modulo-100 arithmetic, this is the same as
+branching backward by 12 cells. This means jumping back over the previous 4 instructions, including the <tt>088</tt>
+instruction. Admittedly, this takes some getting used to. Instructions of the form <tt>1??</tt> are similarly used to
+branch, but here the branching is <font color="#D07070"><i>conditional,</i></font> and occurs if and only if the most
+recent adding or subtracting in a <tt>5??</tt>, <tt>6??</tt>, <tt>8??</tt> or <tt>9??</tt> instruction resulted in an
+overflow. Likewise for instructions the form <tt>2??</tt>, but here the branching occurs if and only if an overflow did
+<i>not</i> occur. <br/><br/><i>Ignore until ready:</i> The indirect addressing cases work as follows. Instead of using
+the cell whose memory address is <tt>0?</tt>, it is assumed that some 2-digit memory address has already been stored in
+main memory, in two contiguous cells, beginning at the memory address <tt>9?</tt>. This stored address is fetched, and
+it is this address that is used in the instruction, in place of memory address <tt>0?</tt>. For example, if 6 is stored
+at address <tt>94</tt>, and 8 is stored at address <tt>95</tt>, then the instruction <tt>804</tt> would cause the
+2-digit value stored at addresses <tt>86</tt> and <tt>87</tt> to be incremented. (The last canned program for the
+application
+demonstrates the usage of indirect addressing.)<br/><br/><h4>The application</h4> The application (below) emulates the
+BDC. The
+user is able to change the values in the main memory cells and the CPU registers, by hand. Each cell is located via its
+address <i>uv</i>, where <i>u</i> determines the row in the display, and <i>v</i> determines the column. There are also
+four buttons on the left, whose behaviors are as follows:
+<ul>
+    <li><tt><b>STEP</b></tt> fetches a 3-digit machine instruction from main memory, copying it into IR. PC determines
+        where to find the start of this instruction in main memory. Then PC is automatically updated, by adding three to
+        it, to anticipate the next instruction. Then the current instruction (in IR) is executed, as detailed earlier.
+    <li><tt><b>RESET</b></tt> zeros out the main memory cells and the CPU registers.
+    <li><tt><b>SAVE</b></tt> allows the present configuration to be saved in a file.
+    <li><tt><b>LOAD</b></tt> restores a previously saved configuration from a file, or else loads one of "canned"
+        programs.
+</ul>
+Note that file I/O is generally not permitted when the applet is executed via a web browser. Also, once the
+<tt>STEP</tt> button has been highlight, the enter/return key on the keyboard can be used to effectively depress it.
+Holding down the enter/return key causes a rapid progression through the machine instructions, thus emulating the
+behavior of a computer executing a program. The user can click on any of the cells that contain numbers in order to
+change these numbers "by hand." In particular, this allows the user to enter a program "by hand." <br><br> The main
+memory cells are color coded to help the user follow program execution details. Most of the cells are <font
+        color="gray">gray</font>. The instruction to be fetched next is colored <font color="magenta">magenta</font>
+though. This is <i>not</i> the current instruction loaded in IR, but rather, the instruction that <i>will be</i> loaded
+next. It starts at the memory address specified by PC. When the user clicks the <tt>STEP</tt> button, this next
+instruction is loaded into IR, and executed. If this execution involves data in main memory, then this data will be
+highlighted in <font color="blue">blue</font>. If indirect addressing is used, then the stored memory address (used to
+find the data cells) is highlighted in <font color="green">green</font>. <br/><br/>Here is the Javascript
+application:<br/><br/>
+<center>
+    <div id="bdc-app">
+    </div>
+</center>
+<br/>(To get the hang of things, load one of the canned programs (1 through 6), and execute it a step at a time. Pay
+attention to the behavior.)<br/><br/><h4>Canned programs</h4>A "canned" (already saved as part of the system) program is
+loaded by entering its number in lieu of a file name. For each of the below program descriptions, <i>x, y, z</i> refer
+to 2-digit data stored in main memory beginning at addresses <tt>94</tt>, <tt>96</tt>, <tt>98</tt> (respectively). Each
+program's behavior is described prior to presenting the actual program code. Also, each instruction's behavior is
+described by means of a comment, usually involving C/Java notation, following a <tt>#</tt>-sign.
+<ol>
+    <li> Multiplies <i>x</i> and <i>y</i>, producing the result in <i>z</i>. This is accomplished by first zeroing out z
+        and then repeatedly adding <i>y</i> to it, while decrementing <i>x</i> and using it as a loop counter. This is a
+        very inefficient way to multiply, but basically the only way available to this computer. It could be improved a
+        bit though. How? Here is the program with comments:
+        <pre>         300             # A = 0     <br>         798             # z = A     <<<--------------------------------------o       <br>         994             # x--                                                |       <br>         109             # if overflow, branch forward 3 instructions  >>>----|----o       <br>         498             # A = z                                              |    |       <br>         596             # A += y                                             |    |       <br>         082             # branch backward 6 instructions   >>>---------------o    |       <br>         000             # halt      <<<-------------------------------------------o  </pre>
+    <li> Divides <i>x</i> by <i>y</i>, rounding down to the nearest integer. The result appears in <i>z</i> and in
+        <i>A</i>. This is accomplished by first zeroing out <i>z</i>, then copying <i>x</i> to <i>A</i> and then
+        repeatedly subtracting <i>y</i> from <i>A</i> while incrementing <i>z</i>. The loop ends when the subtraction
+        causes overflow, because the result should be negative. <i>z</i> is then copied to <i>A</i>. Here is the program
+        with comments:
+        <pre>         300             # A = 0       <br>         798             # z = A       <br>         494             # A = x      <<<--------------------------------------o       <br>         696             # A -= y                                              |       <br>         106             # if overflow, branch forward 2 instructions  >>>-----|----o       <br>         898             # z++                                                 |    |       <br>         088             # branch backwards 4 instructions  >>>----------------o    |       <br>         498             # A = z      <<<-------------------------------------------o       <br>         000             # halt  </pre>
+    <li> Adds all the numbers from <i>x</i> up to <i>y</i>, producing the result in <i>z</i> and in <i>A</i>. Note that
+        <i>x</i> must be less than or equal to <i>y</i>. Here is the program with comments:
+        <pre>         300             # A = 0       <br>         798             # z = A       <br>         498             # A = z      <<<-------------------------------------------o       <br>         594             # A += x                                                   |       <br>         798             # z = A                                                    |       <br>         894             # x++                                                      |       <br>         496             # A = y                                                    |       <br>         694             # A -= x                                                   |       <br>         279             # if no overflow, branch backward 7 instructions  >>>------o       <br>         498             # A = z       <br>         000             # halt </pre>
+    <li> This is an infinite loop that generates the Fibonacci numbers in <i>x, y</i> and <i>z</i>. Here is the program
+        with comments:
+        <pre>         301             # A = 1      <br>         794             # x = A      <br>         796             # y = A      <br>         494             # A = x      <<<-------------------------------------------o      <br>         596             # A += y                                                   |      <br>         798             # z = A                                                    |      <br>         496             # A = y                                                    |      <br>         794             # x = A                                                    |      <br>         498             # A = z                                                    |      <br>         796             # y = A                                                    |      <br>         076             # branch backward 8 instructions  >>>----------------------o</pre>
+    <li> Computes the base-two logarithm of <i>x</i>, rounded down to the nearest integer. The answer is stored in
+        <i>z</i> and in A. Using a loop, <i>y</i> runs through successive power-of-two, which are compared with <i>x</i>.
+        Note that <i>x</i> must be less than 65. Here is the program with comments:
+        <pre>         399             # A = 99    (think of this as -1)      <br>         798             # z = A      <br>         301             # A = 1      <br>         796             # y = A      <br>         494             # A = x     <<<--------------------------------------------o      <br>         696             # A -= y                                                   |      <br>         115             # if overflow, branch forward 5 instruction  >>>------o    |      <br>         898             # z++                                                 |    |      <br>         496             # A = y  (double y now)                               |    |      <br>         596             # A += y                                              |    |      <br>         796             # y = A                                               |    |      <br>         076             # branch backward 8 instructions  >>>-----------------|----o      <br>         498             # A = z     <<<---------------------------------------o      <br>         000             # halt </pre>
+    <li> An example of using a loop and indirect addressing to add the data in an array. <i>y</i> holds the starting
+        address of the array, and <i>z</i> specifies the number of numbers in this array. The sum appears in A. Here is
+        the program with comments:
+        <pre>         300             # A = 0      <br>         998             # z--      <br>         115             # if overflow, branch forward 5 instructions  >>>----------o      <br>         506             # add an array entry to A   <<<-----------------------o    |      <br>         896             # y++                                                 |    |      <br>         896             # y++                                                 |    |      <br>         998             # z--                                                 |    |      <br>         285             # if no overflow, branch backward 5 instructions >>>--o    |      <br>         000             # halt     <<<---------------------------------------------o</pre>
+</ol>
+<br/><br/></body>
+</html>

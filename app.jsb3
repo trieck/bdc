@@ -1,6 +1,6 @@
 {
     "projectName": "Basic Decimal Computer",
-    "licenseText": "Copyright(c) 2012 Michael Q. Rieck, Thomas A. Rieck",
+    "licenseText": "Copyright(c) 2014 Michael Q. Rieck, Thomas A. Rieck",
     "builds": [
         {
             "name": "All Classes",
