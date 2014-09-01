@@ -11,7 +11,7 @@ Ext.define('BDC.lib.ButtonsPanel', {
     padding: '10px',
     items: [
         {
-            xtype: 'component',
+            border: false,
             flex: 0.5
         },
         {
@@ -26,7 +26,7 @@ Ext.define('BDC.lib.ButtonsPanel', {
             flex: 0.6
         },
         {
-            xtype: 'component',
+            border: false,
             flex: 0.5
         },
         {
@@ -41,7 +41,7 @@ Ext.define('BDC.lib.ButtonsPanel', {
             flex: 0.6
         },
         {
-            xtype: 'component',
+            border: false,
             flex: 0.5
         },
         {
@@ -57,7 +57,7 @@ Ext.define('BDC.lib.ButtonsPanel', {
             flex: 0.6
         },
         {
-            xtype: 'component',
+            border: false,
             flex: 0.10
         },
         {
@@ -106,7 +106,7 @@ Ext.define('BDC.lib.ButtonsPanel', {
             }
         },
         {
-            xtype: 'component',
+            border: false,
             flex: 1
         }
     ]

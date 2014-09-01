@@ -40,6 +40,11 @@
                     "path": "app/lib/"
                 },
                 {
+                    "clsName": "BDC.lib.DigitValidator",
+                    "name": "DigitValidator.js",
+                    "path": "app/lib/"
+                },
+                {
                     "clsName": "BDC.lib.Programs",
                     "name": "Programs.js",
                     "path": "app/lib/"

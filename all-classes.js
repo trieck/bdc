@@ -14,7 +14,7 @@ Ext.define('BDC.lib.ButtonsPanel', {
     padding: '10px',
     items: [
         {
-            xtype: 'component',
+            border: false,
             flex: 0.5
         },
         {
@@ -29,7 +29,7 @@ Ext.define('BDC.lib.ButtonsPanel', {
             flex: 0.6
         },
         {
-            xtype: 'component',
+            border: false,
             flex: 0.5
         },
         {
@@ -44,7 +44,7 @@ Ext.define('BDC.lib.ButtonsPanel', {
             flex: 0.6
         },
         {
-            xtype: 'component',
+            border: false,
             flex: 0.5
         },
         {
@@ -60,7 +60,7 @@ Ext.define('BDC.lib.ButtonsPanel', {
             flex: 0.6
         },
         {
-            xtype: 'component',
+            border: false,
             flex: 0.10
         },
         {
@@ -109,7 +109,7 @@ Ext.define('BDC.lib.ButtonsPanel', {
             }
         },
         {
-            xtype: 'component',
+            border: false,
             flex: 1
         }
     ]
@@ -119,7 +119,7 @@ Ext.define('BDC.lib.MemoryPanel', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.memory-panel',
     title: 'Main Memory',
-    uses: [ 'BDC.lib.Colors'],
+    uses: [ 'BDC.lib.Colors', 'BDC.lib.DigitValidator' ],
     columnWidth: 0.6,
     height: 350,
     layout: {
@@ -127,6 +127,12 @@ Ext.define('BDC.lib.MemoryPanel', {
         columns: 11
     },
     padding: '10px',
+
+    digitValidator: function () {
+        var value = this.getValue();
+        if (value.length >= 1)
+            this.setValue(value.slice(0, 1));
+    },
 
     initComponent: function () {
         var i, j;
@@ -136,26 +142,25 @@ Ext.define('BDC.lib.MemoryPanel', {
         for (i = 0; i < 11; ++i) {
             if (i === 0) {
                 this.add({
-                    xtype: 'panel',
                     border: false,
                     width: 60
                 });
             } else {
                 this.add({
-                    xtype: 'text',
                     fieldCls: 'memory-bold-cell',
-                    text: '' + (i - 1),
-                    padding: '2 5 25 11'
+                    html: '' + (i - 1),
+                    padding: '2 5 25 11',
+                    border: false
                 });
             }
         }
         for (i = 0, j = 0; i < 100; ++i) {
             if (i % 10 === 0) {
                 this.add({
-                    xtype: 'text',
                     fieldCls: 'memory-bold-cell',
-                    text: '' + j++,
-                    padding: '0 0 0 10'
+                    html: '' + j++,
+                    padding: '0 0 0 10',
+                    border: false
                 });
             }
 
@@ -168,6 +173,11 @@ Ext.define('BDC.lib.MemoryPanel', {
                 emptyText: '0',
                 width: 25,
                 itemId: 'memory-cell-' + i,
+                vtype: 'digit',
+                enableKeyEvents: true,
+                listeners: {
+                    'keyup': this.digitValidator
+                },
                 margin: '2px'
             });
         }
@@ -256,6 +266,7 @@ Ext.define('BDC.lib.MemoryPanel', {
 Ext.define('BDC.lib.RegistersPanel', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.registers-panel',
+    uses: [ 'BDC.lib.DigitValidator' ],
     title: 'CPU Registers',
     columnWidth: 0.2,
     layout: 'vbox',
@@ -275,6 +286,15 @@ Ext.define('BDC.lib.RegistersPanel', {
             maxLength: 2,
             selectOnFocus: true,
             emptyText: '00',
+            vtype: 'two-digits',
+            enableKeyEvents: true,
+            listeners: {
+                'keyup': function () {
+                    var value = this.getValue();
+                    if (value.length > 2)
+                        this.setValue(value.slice(0, 2));
+                }
+            },
             width: 75,
             padding: '35 0 0 0'
         },
@@ -288,6 +308,15 @@ Ext.define('BDC.lib.RegistersPanel', {
             maxLength: 2,
             selectOnFocus: true,
             emptyText: '00',
+            vtype: 'two-digits',
+            enableKeyEvents: true,
+            listeners: {
+                'keyup': function () {
+                    var value = this.getValue();
+                    if (value.length > 2)
+                        this.setValue(value.slice(0, 2));
+                }
+            },
             width: 75
         },
         {
@@ -300,12 +329,21 @@ Ext.define('BDC.lib.RegistersPanel', {
             maxLength: 3,
             selectOnFocus: true,
             emptyText: '000',
+            vtype: 'three-digits',
+            enableKeyEvents: true,
+            listeners: {
+                'keyup': function () {
+                    var value = this.getValue();
+                    if (value.length > 3)
+                        this.setValue(value.slice(0, 3));
+                }
+            },
             width: 75
         },
         {
             itemId: 'haltText',
             html: 'HALTED',
-            baseCls: 'halt-text'
+            baseCls: 'x-panel-header-text-container-default'
         }
     ],
 
@@ -757,6 +795,40 @@ Ext.define('BDC.lib.Colors', {
         MAGENTA: 'FF00FF'
     }
 });
+Ext.define('BDC.lib.DigitValidator', function () {
+
+    Ext.apply(Ext.form.field.VTypes, {
+        pattern: /^[0-9]$/,
+
+        digit: function (val, field) {
+            return this.pattern.test(val);
+        },
+        digitMask: /[0-9]/
+    });
+
+    Ext.apply(Ext.form.field.VTypes, {
+        pattern: /^[0-9]*[0-9]$/,
+
+        'two-digits': function (val, field) {
+            return this.pattern.test(val);
+        },
+        'two-digitsMask': /[0-9]/
+    });
+
+    Ext.apply(Ext.form.field.VTypes, {
+        pattern: /^[0-9]*[0-9]*[0-9]$/,
+
+        'three-digits': function (val, field) {
+            return this.pattern.test(val);
+        },
+
+        'three-digitsMask': /[0-9]/
+    });
+
+    return this;
+}());
+
+
 Ext.define('BDC.lib.Programs', {
     statics: {
         PROGRAM_ONE: [0, 0, 0,
@@ -830,7 +902,6 @@ Ext.define('BDC.lib.Programs', {
 Ext.define('BDC.lib.Frame', {
     extend: 'Ext.panel.Panel',
     alias: 'bdc-frame',
-    closable: false,
     title: 'Basic Decimal Computer',
     renderTo: 'bdc-app',
     width: 665,

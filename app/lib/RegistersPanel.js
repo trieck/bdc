@@ -1,6 +1,7 @@
 Ext.define('BDC.lib.RegistersPanel', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.registers-panel',
+    uses: [ 'BDC.lib.DigitValidator' ],
     title: 'CPU Registers',
     columnWidth: 0.2,
     layout: 'vbox',
@@ -20,6 +21,15 @@ Ext.define('BDC.lib.RegistersPanel', {
             maxLength: 2,
             selectOnFocus: true,
             emptyText: '00',
+            vtype: 'two-digits',
+            enableKeyEvents: true,
+            listeners: {
+                'keyup': function () {
+                    var value = this.getValue();
+                    if (value.length > 2)
+                        this.setValue(value.slice(0, 2));
+                }
+            },
             width: 75,
             padding: '35 0 0 0'
         },
@@ -33,6 +43,15 @@ Ext.define('BDC.lib.RegistersPanel', {
             maxLength: 2,
             selectOnFocus: true,
             emptyText: '00',
+            vtype: 'two-digits',
+            enableKeyEvents: true,
+            listeners: {
+                'keyup': function () {
+                    var value = this.getValue();
+                    if (value.length > 2)
+                        this.setValue(value.slice(0, 2));
+                }
+            },
             width: 75
         },
         {
@@ -45,12 +64,21 @@ Ext.define('BDC.lib.RegistersPanel', {
             maxLength: 3,
             selectOnFocus: true,
             emptyText: '000',
+            vtype: 'three-digits',
+            enableKeyEvents: true,
+            listeners: {
+                'keyup': function () {
+                    var value = this.getValue();
+                    if (value.length > 3)
+                        this.setValue(value.slice(0, 3));
+                }
+            },
             width: 75
         },
         {
             itemId: 'haltText',
             html: 'HALTED',
-            baseCls: 'halt-text'
+            baseCls: 'x-panel-header-text-container-default'
         }
     ],
 
