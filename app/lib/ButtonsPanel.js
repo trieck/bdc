@@ -12,7 +12,22 @@ Ext.define('BDC.lib.ButtonsPanel', {
     items: [
         {
             border: false,
-            flex: 0.5
+            flex: 0.2
+        },
+        {
+            xtype: 'button',
+            tooltip: { text: 'Assemble source code' },
+            text: 'ASSEMBLE',
+            focusCls: '',
+            id: 'assembleButton',
+            iconCls: 'assemble-icon',
+            iconAlign: 'top',
+            width: '80%',
+            flex: 0.6
+        },
+        {
+            border: false,
+            flex: 0.2
         },
         {
             xtype: 'button',
@@ -27,7 +42,7 @@ Ext.define('BDC.lib.ButtonsPanel', {
         },
         {
             border: false,
-            flex: 0.5
+            flex: 0.2
         },
         {
             xtype: 'button',
@@ -42,7 +57,7 @@ Ext.define('BDC.lib.ButtonsPanel', {
         },
         {
             border: false,
-            flex: 0.5
+            flex: 0.2
         },
         {
             xtype: 'button',
@@ -107,7 +122,7 @@ Ext.define('BDC.lib.ButtonsPanel', {
         },
         {
             border: false,
-            flex: 1
+            flex: 0.2
         }
     ]
 });

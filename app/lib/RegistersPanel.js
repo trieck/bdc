@@ -1,7 +1,7 @@
 Ext.define('BDC.lib.RegistersPanel', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.registers-panel',
-    uses: [ 'BDC.lib.DigitValidator' ],
+    requires: [ 'BDC.lib.DigitValidator' ],
     title: 'CPU Registers',
     columnWidth: 0.2,
     layout: 'vbox',
