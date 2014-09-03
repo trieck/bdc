@@ -6,18 +6,24 @@ Ext.define('BDC.lib.Assembler', {
     statics: {
         PROGRAM_SIZE: 100,
         MNEMONICS: {
-            halt: 0,     // halt the machine
-            j: 0,        // branch unconditionally
-            jo: 1,       // branch if overflow
-            jno: 2,      // branch unless overflow
-            loadi: 3,    // load immediate value to .A
-            load: 4,     // load value in memory to .A
-            add: 5,      // add value in memory to .A
-            sub: 6,      // subtract value in memory from .A
-            store: 7,    // copy .A to memory
-            inc: 8,      // increment value at memory address
-            dec: 9       // decrement value at memory address
+            halt: 0,    // halt the machine
+            j: 0,       // branch unconditionally
+            jo: 1,      // branch if overflow
+            jno: 2,     // branch unless overflow
+            loadi: 3,   // load immediate value to .A
+            load: 4,    // load value in memory to .A
+            add: 5,     // add value in memory to .A
+            sub: 6,     // subtract value in memory from .A
+            store: 7,   // copy .A to memory
+            inc: 8,     // increment value at memory address
+            dec: 9      // decrement value at memory address
         },
+
+        TT_EMPTY: 0,    // empty token
+        TT_ID: 1,       // identifier token
+        TT_NUMBER: 2,   // numeric token
+        TT_LABEL: 3,    // label token
+
         PSEUDO_REGS: [
             'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
         ]
@@ -63,37 +69,70 @@ Ext.define('BDC.lib.Assembler', {
      * @private
      */
     parse: function () {
+        this.i_index = 0;
+        var tt;
+
+        while ((tt = this.getToken()) !== this.self.TT_EMPTY) {
+            switch (tt) {
+                case this.self.TT_LABEL:    // label definition
+                    this.label();
+                    break;
+                case this.self.TT_ID:       // instruction
+                    this.instruction();
+                    break;
+                default:                    // error
+                    this.syntax_error();
+                    break;
+            }
+        }
+    },
+
+    /**
+     * Get next token from input
+     * @private
+     */
+    getToken: function () {
         var c, length = this.program.length;
-        for (this.i_index = 0; this.i_index < length; ++this.i_index) {
+        var tt = this.self.TT_EMPTY;
+
+        for (this.token = ''; this.i_index < length; ++this.i_index) {
             c = this.program[this.i_index];
             switch (c) {
                 case ' ':   // token delimiter
                 case '\t':
                 case '\r':
                     if (this.token.length) {
-                        this.instruction();
-                        this.token = '';
+                        return tt;
                     }
                     break;
                 case ':':   // label definition
-                    this.label();
-                    this.token = '';
+                    if (this.token.length) {
+                        return this.self.TT_LABEL;
+                    }
                     break;
                 case ';':   // comment
-                    this.comment();
-                    this.token = '';
+                    this.comment(); // eat
                     break;
                 case '\n':
-                    this.token = '';
                     this.line_no++;
+                    if (this.token.length) {
+                        return tt;
+                    }
                     break;
                 default:
-                    if (BDC.lib.Character.isalnum(c)) {
+                    if (BDC.lib.Character.isdigit(c)) {
+                        tt = this.self.TT_NUMBER;
+                        this.token += c;
+                    }
+                    if (BDC.lib.Character.isalpha(c)) {
+                        tt = this.self.TT_ID;
                         this.token += c;
                     }
                     break;
             }
         }
+
+        return tt;
     },
 
     /**
@@ -119,7 +158,51 @@ Ext.define('BDC.lib.Assembler', {
      * @param instr
      */
     assemble_instr: function (instr) {
+        switch (instr) {
+            case this.self.MNEMONICS.loadi:   // load immediate
+                this.load_immediate();
+                break;
+            case this.self.MNEMONICS.store: // store accumulator to memory
+                this.store();
+                break;
+        }
+    },
 
+    /**
+     * Load immediate
+     */
+    load_immediate: function () {
+        var value = this.getValue();
+        this.memory[this.o_index++] = this.self.MNEMONICS.loadi;
+        this.memory[this.o_index++] = value % 10;
+        this.memory[this.o_index++] = value / 10;
+    },
+
+    /**
+     * Store accumulator to memory
+     * @private
+     */
+    store: function () {
+
+    },
+
+    /**
+     * Get 1 or 2 digit value
+     */
+    getValue: function () {
+        var value, tt = this.getToken();
+        if (tt !== this.self.TT_NUMBER)
+            this.syntax_error();
+
+        value = parseInt(this.token, 10);
+        if (isNaN(value)) {
+            this.syntax_error();
+        }
+
+        if (0 > value || value > 99)
+            this.error('number out of range.');
+
+        return value;
     },
 
     /**
@@ -150,6 +233,7 @@ Ext.define('BDC.lib.Assembler', {
             this.error('label already defined.');
         }
 
+        // FIXME:
         if (Ext.Array.contains(this.self.PSEUDO_REGS, this.token)) {
             this.error('illegal label.');
         }
