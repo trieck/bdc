@@ -39,7 +39,8 @@ Ext.define('BDC.lib.Assembler', {
     },
 
     memory: [],     // memory to assemble to
-    labels: {},     // labels
+    symbols: {},    // symbol table
+    refs: [],       // forward reference list
     program: '',    // input program
     token: '',      // current input token
     i_index: 0,     // current input index
@@ -52,7 +53,8 @@ Ext.define('BDC.lib.Assembler', {
      */
     initialize: function () {
         this.memory = new Array(this.self.PROGRAM_SIZE);
-        this.labels = {};
+        this.symbols = {};
+        this.refs = [];
         this.i_index = this.o_index = this.line_no;
         this.token = this.program = '';
     },
@@ -71,6 +73,7 @@ Ext.define('BDC.lib.Assembler', {
         this.initialize();
         this.program = program.toLowerCase();
         this.parse();
+        this.resolve();
     },
 
     /**
@@ -94,6 +97,14 @@ Ext.define('BDC.lib.Assembler', {
                     break;
             }
         }
+    },
+
+    /**
+     * Resolve forward references
+     * @private
+     */
+    resolve: function () {
+
     },
 
     /**
@@ -184,20 +195,33 @@ Ext.define('BDC.lib.Assembler', {
     },
 
     /**
+     * Assemble value
+     * @param value
+     * @private
+     */
+    assemble_val: function (value) {
+        this.memory[this.o_index++] = value % 10;
+        this.memory[this.o_index++] = Math.floor(value / 10);
+    },
+
+    /**
      * Jump if overflow set
+     * @private
      */
     jo: function () {
         var value = this.getLocation();
+        this.memory[this.o_index++] = this.self.MNEMONICS.jo;
+        this.assemble_val(value);
     },
 
     /**
      * Load immediate value to accumulator
+     * @private
      */
     load_immediate: function () {
-        var value = this.getValue();
+        var value = this.getImmediate();
         this.memory[this.o_index++] = this.self.MNEMONICS.loadi;
-        this.memory[this.o_index++] = value % 10;
-        this.memory[this.o_index++] = Math.floor(value / 10);
+        this.assemble_val(value);
     },
 
     /**
@@ -205,10 +229,9 @@ Ext.define('BDC.lib.Assembler', {
      * @private
      */
     store: function () {
-        var value = this.getSymValue();
+        var value = this.getAbsolute();
         this.memory[this.o_index++] = this.self.MNEMONICS.store;
-        this.memory[this.o_index++] = value % 10;
-        this.memory[this.o_index++] = Math.floor(value / 10);
+        this.assemble_val(value);
     },
 
     /**
@@ -216,16 +239,17 @@ Ext.define('BDC.lib.Assembler', {
      * @private
      */
     dec: function () {
-        var value = this.getSymValue();
+        var value = this.getAbsolute();
         this.memory[this.o_index++] = this.self.MNEMONICS.dec;
-        this.memory[this.o_index++] = value % 10;
-        this.memory[this.o_index++] = Math.floor(value / 10);
+        this.assemble_val(value);
     },
 
     /**
-     * Get 1 or 2 digit value
+     * Get immediate value
+     * @private
+     * @return {Number}
      */
-    getValue: function () {
+    getImmediate: function () {
         var tt = this.getToken();
         if (tt !== this.self.TT_NUMBER)
             this.syntax_error();
@@ -250,15 +274,19 @@ Ext.define('BDC.lib.Assembler', {
     },
 
     /**
-     * Get 1 or 2 digit value or pseudo register location
+     * Get absolute value
+     * @private
+     * @return {Number}
      */
-    getSymValue: function () {
+    getAbsolute: function () {
         var value, tt = this.getToken();
-        if (tt !== this.self.TT_NUMBER && tt !== this.self.TT_ID)
+        if (tt !== this.self.TT_NUMBER && tt !== this.self.TT_ID) {
             this.syntax_error();
+        }
 
-        if (tt === this.self.TT_NUMBER)
+        if (tt === this.self.TT_NUMBER) {
             return this.parseValue();
+        }
 
         if ((value = this.self.PSEUDO_REGS[this.token]) === undefined) {
             this.error('undefined symbol');
@@ -268,10 +296,23 @@ Ext.define('BDC.lib.Assembler', {
     },
 
     /**
-     * Get memory location or label reference
+     * Get memory location or symbol table value
      */
     getLocation: function () {
+        var value, tt = this.getToken();
+        if (tt !== this.self.TT_NUMBER && tt !== this.self.TT_ID)
+            this.syntax_error();
 
+        if (tt === this.self.TT_NUMBER)
+            return this.parseValue();
+
+        if ((value = this.symbols[this.token]) !== undefined)
+            return value;
+
+        // undefined, generate a forward reference
+        this.refs.push({name: this.token, location: this.o_index });
+
+        return 0;
     },
 
     /**
@@ -298,8 +339,8 @@ Ext.define('BDC.lib.Assembler', {
             this.syntax_error();
         }
 
-        // can't re-define
-        if (this.labels[this.token] !== undefined) {
+        // can't re-define a label
+        if (this.symbols[this.token] !== undefined) {
             this.error('label already defined.');
         }
 
@@ -308,7 +349,7 @@ Ext.define('BDC.lib.Assembler', {
             this.error('illegal label.');
         }
 
-        this.labels[this.token] = this.o_index;
+        this.symbols[this.token] = this.o_index;
     },
 
     /**
