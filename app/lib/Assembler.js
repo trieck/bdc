@@ -24,13 +24,22 @@ Ext.define('BDC.lib.Assembler', {
         TT_NUMBER: 2,   // numeric token
         TT_LABEL: 3,    // label token
 
-        PSEUDO_REGS: [
-            'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
-        ]
+        PSEUDO_REGS: {
+            q: 80,
+            r: 82,
+            s: 84,
+            t: 86,
+            u: 88,
+            v: 90,
+            w: 92,
+            x: 94,
+            y: 96,
+            z: 98
+        }
     },
 
     memory: [],     // memory to assemble to
-    labels: [],     // labels table
+    labels: {},     // labels
     program: '',    // input program
     token: '',      // current input token
     i_index: 0,     // current input index
@@ -43,7 +52,7 @@ Ext.define('BDC.lib.Assembler', {
      */
     initialize: function () {
         this.memory = new Array(this.self.PROGRAM_SIZE);
-        this.labels = [];
+        this.labels = {};
         this.i_index = this.o_index = this.line_no;
         this.token = this.program = '';
     },
@@ -165,17 +174,30 @@ Ext.define('BDC.lib.Assembler', {
             case this.self.MNEMONICS.store: // store accumulator to memory
                 this.store();
                 break;
+            case this.self.MNEMONICS.dec:   // decremement memory
+                this.dec();
+                break;
+            case this.self.MNEMONICS.jo:    // jump if overflow
+                this.jo();
+                break;
         }
     },
 
     /**
-     * Load immediate
+     * Jump if overflow set
+     */
+    jo: function () {
+        var value = this.getLocation();
+    },
+
+    /**
+     * Load immediate value to accumulator
      */
     load_immediate: function () {
         var value = this.getValue();
         this.memory[this.o_index++] = this.self.MNEMONICS.loadi;
         this.memory[this.o_index++] = value % 10;
-        this.memory[this.o_index++] = value / 10;
+        this.memory[this.o_index++] = Math.floor(value / 10);
     },
 
     /**
@@ -183,18 +205,40 @@ Ext.define('BDC.lib.Assembler', {
      * @private
      */
     store: function () {
+        var value = this.getSymValue();
+        this.memory[this.o_index++] = this.self.MNEMONICS.store;
+        this.memory[this.o_index++] = value % 10;
+        this.memory[this.o_index++] = Math.floor(value / 10);
+    },
 
+    /**
+     * Decrement memory
+     * @private
+     */
+    dec: function () {
+        var value = this.getSymValue();
+        this.memory[this.o_index++] = this.self.MNEMONICS.dec;
+        this.memory[this.o_index++] = value % 10;
+        this.memory[this.o_index++] = Math.floor(value / 10);
     },
 
     /**
      * Get 1 or 2 digit value
      */
     getValue: function () {
-        var value, tt = this.getToken();
+        var tt = this.getToken();
         if (tt !== this.self.TT_NUMBER)
             this.syntax_error();
 
-        value = parseInt(this.token, 10);
+        return this.parseValue();
+    },
+
+    /**
+     * Parse token value
+     * @returns {Number}
+     */
+    parseValue: function () {
+        var value = parseInt(this.token, 10);
         if (isNaN(value)) {
             this.syntax_error();
         }
@@ -203,6 +247,31 @@ Ext.define('BDC.lib.Assembler', {
             this.error('number out of range.');
 
         return value;
+    },
+
+    /**
+     * Get 1 or 2 digit value or pseudo register location
+     */
+    getSymValue: function () {
+        var value, tt = this.getToken();
+        if (tt !== this.self.TT_NUMBER && tt !== this.self.TT_ID)
+            this.syntax_error();
+
+        if (tt === this.self.TT_NUMBER)
+            return this.parseValue();
+
+        if ((value = this.self.PSEUDO_REGS[this.token]) === undefined) {
+            this.error('undefined symbol');
+        }
+
+        return value;
+    },
+
+    /**
+     * Get memory location or label reference
+     */
+    getLocation: function () {
+
     },
 
     /**
@@ -229,16 +298,17 @@ Ext.define('BDC.lib.Assembler', {
             this.syntax_error();
         }
 
-        if (Ext.Array.contains(this.labels, this.token)) {
+        // can't re-define
+        if (this.labels[this.token] !== undefined) {
             this.error('label already defined.');
         }
 
-        // FIXME:
-        if (Ext.Array.contains(this.self.PSEUDO_REGS, this.token)) {
+        // can't be a pseudo register
+        if (this.self.PSEUDO_REGS[this.token] !== undefined) {
             this.error('illegal label.');
         }
 
-        this.labels.push({ label: this.token, location: this.o_index});
+        this.labels[this.token] = this.o_index;
     },
 
     /**
