@@ -47,7 +47,7 @@ Ext.define('BDC.controller.Controller', {
 
     onAssemble: function () {
         var assembler = Ext.create('BDC.lib.Assembler');
-        var message;
+        var memory, message;
 
         var program = "LOADI 0 ; put 0 in accumulator\n" +
             "loop: STORE z ; copy accumulator to z\n" +
@@ -59,7 +59,7 @@ Ext.define('BDC.controller.Controller', {
             "done: HALT ; finished\n";
 
         try {
-            assembler.assemble(program);
+            memory = assembler.assemble(program);
         } catch (e) {
             message = Ext.String.format("Error: {0}, Line: {1}", e.error, e.line_no);
             Ext.Msg.alert(message);

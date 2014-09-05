@@ -6,7 +6,7 @@ Ext.define('BDC.lib.Assembler', {
     statics: {
         PROGRAM_SIZE: 100,
         MNEMONICS: {
-            halt: 0,    // halt the machine
+            halt: -1,   // halt the machine
             j: 0,       // branch unconditionally
             jo: 1,      // branch if overflow
             jno: 2,     // branch unless overflow
@@ -55,7 +55,8 @@ Ext.define('BDC.lib.Assembler', {
         this.memory = new Array(this.self.PROGRAM_SIZE);
         this.symbols = {};
         this.refs = [];
-        this.i_index = this.o_index = this.line_no;
+        this.i_index = this.o_index = 0;
+        this.line_no = 1;
         this.token = this.program = '';
     },
 
@@ -67,13 +68,14 @@ Ext.define('BDC.lib.Assembler', {
      * Assemble input program
      * @public
      * @param program
-     * @returns assembled program
+     * @returns {Array} assembled program
      */
     assemble: function (program) {
         this.initialize();
         this.program = program.toLowerCase();
         this.parse();
         this.resolve();
+        return this.memory;
     },
 
     /**
@@ -105,6 +107,14 @@ Ext.define('BDC.lib.Assembler', {
      */
     resolve: function () {
 
+        Ext.each(this.refs, function (ref) {
+            var sym, message;
+            if ((sym = this.symbols[ref.name]) === undefined) {
+                message = Ext.String.format('can\'t find label {0}.', ref.name);
+                throw { error: message, line_no: ref.line_no };
+            }
+            this.memory[ref.location] = sym;
+        }, this);
     },
 
     /**
@@ -179,17 +189,38 @@ Ext.define('BDC.lib.Assembler', {
      */
     assemble_instr: function (instr) {
         switch (instr) {
-            case this.self.MNEMONICS.loadi:   // load immediate
-                this.load_immediate();
+            case this.self.MNEMONICS.halt:  // halt
+                this.halt();
+                break;
+            case this.self.MNEMONICS.j:     // branch
+                this.j();
+                break;
+            case this.self.MNEMONICS.jo:    // branch on overflow
+                this.jo();
+                break;
+            case this.self.MNEMONICS.jno:    // branch undless overflow
+                this.jno();
+                break;
+            case this.self.MNEMONICS.loadi: // load immediate
+                this.loadi();
+                break;
+            case this.self.MNEMONICS.load:  // load value in memory to accumulator
+                this.load();
+                break;
+            case this.self.MNEMONICS.add:   // add value in memory to accumulator
+                this.add();
+                break;
+            case this.self.MNEMONICS.sub:   // subtract value in memory from accumulator
+                this.sub();
                 break;
             case this.self.MNEMONICS.store: // store accumulator to memory
                 this.store();
                 break;
-            case this.self.MNEMONICS.dec:   // decremement memory
-                this.dec();
+            case this.self.MNEMONICS.inc:   // increment value in memory
+                this.inc();
                 break;
-            case this.self.MNEMONICS.jo:    // jump if overflow
-                this.jo();
+            case this.self.MNEMONICS.dec:   // decremement value in memory
+                this.dec();
                 break;
         }
     },
@@ -205,6 +236,25 @@ Ext.define('BDC.lib.Assembler', {
     },
 
     /**
+     * Halt
+     * @private
+     */
+    halt: function () {
+        this.memory[this.o_index++] = this.self.MNEMONICS.j;
+        this.assemble_val(0);
+    },
+
+    /**
+     * Jump
+     * @private
+     */
+    j: function () {
+        var value = this.getLocation();
+        this.memory[this.o_index++] = this.self.MNEMONICS.j;
+        this.assemble_val(value);
+    },
+
+    /**
      * Jump if overflow set
      * @private
      */
@@ -215,10 +265,31 @@ Ext.define('BDC.lib.Assembler', {
     },
 
     /**
+     * Jump unless overflow set
+     * @private
+     */
+    jno: function () {
+        var value = this.getLocation();
+        this.memory[this.o_index++] = this.self.MNEMONICS.jno;
+        this.assemble_val(value);
+    },
+
+
+    /**
+     * Load memory to accumulator
+     * @private
+     */
+    load: function () {
+        var value = this.getAbsolute();
+        this.memory[this.o_index++] = this.self.MNEMONICS.load;
+        this.assemble_val(value);
+    },
+
+    /**
      * Load immediate value to accumulator
      * @private
      */
-    load_immediate: function () {
+    loadi: function () {
         var value = this.getImmediate();
         this.memory[this.o_index++] = this.self.MNEMONICS.loadi;
         this.assemble_val(value);
@@ -235,7 +306,37 @@ Ext.define('BDC.lib.Assembler', {
     },
 
     /**
-     * Decrement memory
+     * Add value in memory to accumulator
+     * @private
+     */
+    add: function () {
+        var value = this.getAbsolute();
+        this.memory[this.o_index++] = this.self.MNEMONICS.add;
+        this.assemble_val(value);
+    },
+
+    /**
+     * Subtract value in memory from accumulator
+     * @private
+     */
+    sub: function () {
+        var value = this.getAbsolute();
+        this.memory[this.o_index++] = this.self.MNEMONICS.sub;
+        this.assemble_val(value);
+    },
+
+    /**
+     * Increment a value in memory
+     * @private
+     */
+    inc: function () {
+        var value = this.getAbsolute();
+        this.memory[this.o_index++] = this.self.MNEMONICS.inc;
+        this.assemble_val(value);
+    },
+
+    /**
+     * Decrement a value in memory
      * @private
      */
     dec: function () {
@@ -247,7 +348,7 @@ Ext.define('BDC.lib.Assembler', {
     /**
      * Get immediate value
      * @private
-     * @return {Number}
+     * @returns {Number}
      */
     getImmediate: function () {
         var tt = this.getToken();
@@ -310,7 +411,7 @@ Ext.define('BDC.lib.Assembler', {
             return value;
 
         // undefined, generate a forward reference
-        this.refs.push({name: this.token, location: this.o_index });
+        this.refs.push({ name: this.token, location: this.o_index + 1, line_no: this.line_no });
 
         return 0;
     },
