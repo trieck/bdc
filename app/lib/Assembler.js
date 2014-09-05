@@ -52,7 +52,7 @@ Ext.define('BDC.lib.Assembler', {
      * @private
      */
     initialize: function () {
-        this.memory = new Array(this.self.PROGRAM_SIZE);
+        this.memory = Array.apply(null, new Array(this.self.PROGRAM_SIZE)).map(Number.prototype.valueOf, 0);
         this.symbols = {};
         this.refs = [];
         this.i_index = this.o_index = 0;
@@ -113,7 +113,8 @@ Ext.define('BDC.lib.Assembler', {
                 message = Ext.String.format('can\'t find label {0}.', ref.name);
                 throw { error: message, line_no: ref.line_no };
             }
-            this.memory[ref.location] = sym;
+            this.memory[ref.location] = sym % 10;
+            this.memory[ref.location + 1] = Math.floor(sym / 10);
         }, this);
     },
 
@@ -128,7 +129,7 @@ Ext.define('BDC.lib.Assembler', {
         for (this.token = ''; this.i_index < length; ++this.i_index) {
             c = this.program[this.i_index];
             switch (c) {
-                case ' ':   // token delimiter
+                case ' ':   // whitespace delimiter
                 case '\t':
                 case '\r':
                     if (this.token.length) {
@@ -143,7 +144,7 @@ Ext.define('BDC.lib.Assembler', {
                 case ';':   // comment
                     this.comment(); // eat
                     break;
-                case '\n':
+                case '\n':  // new line
                     this.line_no++;
                     if (this.token.length) {
                         return tt;
@@ -151,12 +152,17 @@ Ext.define('BDC.lib.Assembler', {
                     break;
                 default:
                     if (BDC.lib.Character.isdigit(c)) {
-                        tt = this.self.TT_NUMBER;
+                        if (tt === this.self.TT_EMPTY) {
+                            tt = this.self.TT_NUMBER;
+                        }
                         this.token += c;
-                    }
-                    if (BDC.lib.Character.isalpha(c)) {
+                        continue;
+                    } else if (BDC.lib.Character.isalpha(c)) {
                         tt = this.self.TT_ID;
                         this.token += c;
+                        continue;
+                    } else {
+                        this.syntax_error();
                     }
                     break;
             }
@@ -193,12 +199,12 @@ Ext.define('BDC.lib.Assembler', {
                 this.halt();
                 break;
             case this.self.MNEMONICS.j:     // branch
-                this.j();
+                this.jump();
                 break;
             case this.self.MNEMONICS.jo:    // branch on overflow
                 this.jo();
                 break;
-            case this.self.MNEMONICS.jno:    // branch undless overflow
+            case this.self.MNEMONICS.jno:    // branch unless overflow
                 this.jno();
                 break;
             case this.self.MNEMONICS.loadi: // load immediate
@@ -248,7 +254,7 @@ Ext.define('BDC.lib.Assembler', {
      * Jump
      * @private
      */
-    j: function () {
+    jump: function () {
         var value = this.getLocation();
         this.memory[this.o_index++] = this.self.MNEMONICS.j;
         this.assemble_val(value);

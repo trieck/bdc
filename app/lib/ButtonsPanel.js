@@ -17,9 +17,9 @@ Ext.define('BDC.lib.ButtonsPanel', {
         {
             xtype: 'button',
             tooltip: { text: 'Assemble source code' },
-            text: 'ASSEMBLE',
+            text: 'ASSEMBLER',
             focusCls: '',
-            id: 'assembleButton',
+            id: 'assemblerButton',
             iconCls: 'assemble-icon',
             iconAlign: 'top',
             width: '80%',

@@ -232,5 +232,20 @@ Ext.define('BDC.view.View', {
         pc1 = registersPanel.pc1;
         pc = pc0 + 10 * pc1;
         this.highlightInstruction(pc, BDC.lib.Colors.MAGENTA);
+    },
+
+    loadAssembledProgram: function (program) {
+        var memoryPanel, i, j, n = 0;
+        memoryPanel = this.getComponent('memoryPanel');
+
+        this.reset();
+
+        for (i = 0; i < 10; i++) {
+            for (j = 0; j < 10; j++) {
+                memoryPanel.setCellValue(i, j, program[n++]);
+            }
+        }
+
+        this.highlightInstruction(0, BDC.lib.Colors.MAGENTA);
     }
 });

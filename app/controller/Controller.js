@@ -11,8 +11,8 @@ Ext.define('BDC.controller.Controller', {
             'bdc-view': {
                 afterrender: this.onViewAfterRender
             },
-            '#assembleButton': {
-                click: this.onAssemble
+            '#assemblerButton': {
+                click: this.onAssembler
             },
             '#resetButton': {
                 click: this.onReset
@@ -45,9 +45,10 @@ Ext.define('BDC.controller.Controller', {
         view.reset();
     },
 
-    onAssemble: function () {
+    onAssembler: function () {
         var assembler = Ext.create('BDC.lib.Assembler');
         var memory, message;
+        var view = this.getBDCView();
 
         var program = "LOADI 0 ; put 0 in accumulator\n" +
             "loop: STORE z ; copy accumulator to z\n" +
@@ -63,7 +64,10 @@ Ext.define('BDC.controller.Controller', {
         } catch (e) {
             message = Ext.String.format("Error: {0}, Line: {1}", e.error, e.line_no);
             Ext.Msg.alert(message);
+            return;
         }
+
+        view.loadAssembledProgram(memory);
     },
 
     onReset: function () {
