@@ -108,13 +108,16 @@ Ext.define('BDC.lib.Assembler', {
     resolve: function () {
 
         Ext.each(this.refs, function (ref) {
-            var sym, message;
-            if ((sym = this.symbols[ref.name]) === undefined) {
+            var value, message;
+            if ((value = this.symbols[ref.name]) === undefined) {
                 message = Ext.String.format('can\'t find label {0}.', ref.name);
                 throw { error: message, line_no: ref.line_no };
             }
-            this.memory[ref.location] = sym % 10;
-            this.memory[ref.location + 1] = Math.floor(sym / 10);
+            // calculate real offset
+            value = value - ref.location - 3;
+            value = ((value % this.self.PROGRAM_SIZE) + this.self.PROGRAM_SIZE) % this.self.PROGRAM_SIZE;
+            this.memory[ref.location] = value % 10;
+            this.memory[ref.location + 1] = Math.floor(value / 10);
         }, this);
     },
 
@@ -246,8 +249,8 @@ Ext.define('BDC.lib.Assembler', {
      * @private
      */
     halt: function () {
-        this.memory[this.o_index++] = this.self.MNEMONICS.j;
         this.assemble_val(0);
+        this.memory[this.o_index++] = this.self.MNEMONICS.j;
     },
 
     /**
@@ -256,8 +259,8 @@ Ext.define('BDC.lib.Assembler', {
      */
     jump: function () {
         var value = this.getLocation();
-        this.memory[this.o_index++] = this.self.MNEMONICS.j;
         this.assemble_val(value);
+        this.memory[this.o_index++] = this.self.MNEMONICS.j;
     },
 
     /**
@@ -266,8 +269,8 @@ Ext.define('BDC.lib.Assembler', {
      */
     jo: function () {
         var value = this.getLocation();
-        this.memory[this.o_index++] = this.self.MNEMONICS.jo;
         this.assemble_val(value);
+        this.memory[this.o_index++] = this.self.MNEMONICS.jo;
     },
 
     /**
@@ -276,8 +279,8 @@ Ext.define('BDC.lib.Assembler', {
      */
     jno: function () {
         var value = this.getLocation();
-        this.memory[this.o_index++] = this.self.MNEMONICS.jno;
         this.assemble_val(value);
+        this.memory[this.o_index++] = this.self.MNEMONICS.jno;
     },
 
 
@@ -287,8 +290,8 @@ Ext.define('BDC.lib.Assembler', {
      */
     load: function () {
         var value = this.getAbsolute();
-        this.memory[this.o_index++] = this.self.MNEMONICS.load;
         this.assemble_val(value);
+        this.memory[this.o_index++] = this.self.MNEMONICS.load;
     },
 
     /**
@@ -297,8 +300,8 @@ Ext.define('BDC.lib.Assembler', {
      */
     loadi: function () {
         var value = this.getImmediate();
-        this.memory[this.o_index++] = this.self.MNEMONICS.loadi;
         this.assemble_val(value);
+        this.memory[this.o_index++] = this.self.MNEMONICS.loadi;
     },
 
     /**
@@ -307,8 +310,8 @@ Ext.define('BDC.lib.Assembler', {
      */
     store: function () {
         var value = this.getAbsolute();
-        this.memory[this.o_index++] = this.self.MNEMONICS.store;
         this.assemble_val(value);
+        this.memory[this.o_index++] = this.self.MNEMONICS.store;
     },
 
     /**
@@ -317,8 +320,8 @@ Ext.define('BDC.lib.Assembler', {
      */
     add: function () {
         var value = this.getAbsolute();
-        this.memory[this.o_index++] = this.self.MNEMONICS.add;
         this.assemble_val(value);
+        this.memory[this.o_index++] = this.self.MNEMONICS.add;
     },
 
     /**
@@ -327,8 +330,8 @@ Ext.define('BDC.lib.Assembler', {
      */
     sub: function () {
         var value = this.getAbsolute();
-        this.memory[this.o_index++] = this.self.MNEMONICS.sub;
         this.assemble_val(value);
+        this.memory[this.o_index++] = this.self.MNEMONICS.sub;
     },
 
     /**
@@ -337,8 +340,8 @@ Ext.define('BDC.lib.Assembler', {
      */
     inc: function () {
         var value = this.getAbsolute();
-        this.memory[this.o_index++] = this.self.MNEMONICS.inc;
         this.assemble_val(value);
+        this.memory[this.o_index++] = this.self.MNEMONICS.inc;
     },
 
     /**
@@ -347,8 +350,8 @@ Ext.define('BDC.lib.Assembler', {
      */
     dec: function () {
         var value = this.getAbsolute();
-        this.memory[this.o_index++] = this.self.MNEMONICS.dec;
         this.assemble_val(value);
+        this.memory[this.o_index++] = this.self.MNEMONICS.dec;
     },
 
     /**
@@ -413,11 +416,15 @@ Ext.define('BDC.lib.Assembler', {
         if (tt === this.self.TT_NUMBER)
             return this.parseValue();
 
-        if ((value = this.symbols[this.token]) !== undefined)
+        if ((value = this.symbols[this.token]) !== undefined) {
+            // calculate real offset
+            value = ((this.self.PROGRAM_SIZE - this.o_index) + value) - 3;
+            value = ((value % this.self.PROGRAM_SIZE) + this.self.PROGRAM_SIZE) % this.self.PROGRAM_SIZE;
             return value;
+        }
 
         // undefined, generate a forward reference
-        this.refs.push({ name: this.token, location: this.o_index + 1, line_no: this.line_no });
+        this.refs.push({ name: this.token, location: this.o_index, line_no: this.line_no });
 
         return 0;
     },

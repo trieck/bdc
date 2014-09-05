@@ -53,7 +53,7 @@ Ext.define('BDC.controller.Controller', {
         var program = "LOADI 0 ; put 0 in accumulator\n" +
             "loop: STORE z ; copy accumulator to z\n" +
             "DEC x ; decrement x\n" +
-            "JO done ; jump ahead if overflow\n" +
+            "JNO done ; jump ahead if overflow\n" +
             "LOAD z ; copy z to accumulator\n" +
             "ADD y ; add y to accumulator\n" +
             "J loop ; jump back to loop\n" +
