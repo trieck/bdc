@@ -1,9 +1,10 @@
 Ext.define('BDC.controller.Controller', {
     extend: 'Ext.app.Controller',
-    uses: ['BDC.lib.Programs', 'BDC.lib.Assembler'],
+    uses: ['BDC.lib.Programs', 'BDC.lib.AssemblerEditor'],
     views: [ 'BDC.view.View' ],
     refs: [
-        { selector: 'bdc-view', ref: 'BDCView' }
+        { selector: 'bdc-view', ref: 'BDCView' },
+        { selector: 'panel[itemId=bdc-assembler]', ref: 'Assembler' }
     ],
 
     init: function () {
@@ -13,6 +14,9 @@ Ext.define('BDC.controller.Controller', {
             },
             '#assemblerButton': {
                 click: this.onAssembler
+            },
+            '#assembleButton': {
+                click: this.onAssemble
             },
             '#resetButton': {
                 click: this.onReset
@@ -46,21 +50,15 @@ Ext.define('BDC.controller.Controller', {
     },
 
     onAssembler: function () {
-        var assembler = Ext.create('BDC.lib.Assembler');
-        var memory, message;
+        BDC.lib.AssemblerEditor.show();
+    },
+
+    onAssemble: function () {
+        var memory, message, editor = this.getAssembler();
         var view = this.getBDCView();
 
-        var program = "LOADI 0 ; put 0 in accumulator\n" +
-            "loop: STORE z ; copy accumulator to z\n" +
-            "DEC x ; decrement x\n" +
-            "JNO done ; jump ahead if overflow\n" +
-            "LOAD z ; copy z to accumulator\n" +
-            "ADD y ; add y to accumulator\n" +
-            "J loop ; jump back to loop\n" +
-            "done: HALT ; finished\n";
-
         try {
-            memory = assembler.assemble(program);
+            memory = editor.assemble();
         } catch (e) {
             message = Ext.String.format("Error: {0}, Line: {1}", e.error, e.line_no);
             Ext.Msg.alert(message);
