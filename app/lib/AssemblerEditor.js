@@ -43,7 +43,27 @@ Ext.define('BDC.lib.AssemblerEditor', {
                 'fontFamily': 'courier new',
                 'fontSize': '14px'
             },
-            validationEvent: false
+            validationEvent: false,
+            enableKeyEvents: true,
+            listeners: {
+                keydown: function (field, e) {
+                    if (e.getKey() === e.TAB) {
+                        e.stopEvent();
+                        field.insertTab();
+                    }
+                }
+            },
+            insertTab: function () {
+                var el = this.inputEl.dom;
+                if (el.setSelectionRange) {
+                    var withIns = el.value.substring(0, el.selectionStart) + '\t';
+                    var pos = withIns.length;
+                    el.value = withIns + el.value.substring(el.selectionEnd, el.value.length);
+                    el.setSelectionRange(pos, pos);
+                } else if (document.selection) {
+                    document.selection.createRange().text = '\t';
+                }
+            }
         }
     ],
 
