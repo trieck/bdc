@@ -1,7 +1,11 @@
 Ext.define('BDC.lib.StatusPanel', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.status-panel',
-    requires: [ 'BDC.lib.RegistersPanel', 'BDC.lib.HaltPanel' ],
+    requires: [
+        'BDC.lib.RegistersPanel',
+        'BDC.lib.FlagsPanel',
+        'BDC.lib.HaltPanel'
+    ],
     columnWidth: 0.2,
     layout: {
         type: 'vbox',
@@ -13,6 +17,10 @@ Ext.define('BDC.lib.StatusPanel', {
         {
             xtype: 'registers-panel',
             itemId: 'registersPanel'
+        },
+        {
+            xtype: 'flags-panel',
+            itemId: 'flagsPanel'
         },
         {
             xtype: 'halt-panel',

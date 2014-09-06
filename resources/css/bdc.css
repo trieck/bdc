@@ -36,6 +36,14 @@
     border: none;
 }
 
+.register-label {
+    font-family: "Menlo", "Courier New", "Courier", monospace;
+    font-weight: 900;
+    font-size: 12px;
+    color: darkblue;
+    text-align: left;
+}
+
 .reset-icon {
     background-image: url(../images/reset.png) !important;
 }

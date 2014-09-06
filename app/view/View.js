@@ -24,12 +24,16 @@ Ext.define('BDC.view.View', {
         }
     ],
 
-    registersPanel: function() {
+    registersPanel: function () {
         return Ext.ComponentQuery.query('#registersPanel')[0];
     },
 
-    haltPanel: function() {
+    haltPanel: function () {
         return Ext.ComponentQuery.query('#haltPanel')[0];
+    },
+
+    flagsPanel: function () {
+        return Ext.ComponentQuery.query('#flagsPanel')[0];
     },
 
     reset: function () {
@@ -43,6 +47,9 @@ Ext.define('BDC.view.View', {
         panel.clearHalt();
 
         this.of = false;
+
+        panel = this.flagsPanel();
+        panel.setOverflow(this.of);
     },
 
     highlightInstruction: function (pc, color) {
@@ -76,7 +83,7 @@ Ext.define('BDC.view.View', {
     },
 
     step: function () {
-        var memoryPanel, registersPanel, haltPanel;
+        var memoryPanel, registersPanel, haltPanel, flagsPanel;
         var acc, ac0, ac1, pc, pc0, pc1, ir0, ir1, ir2;
         var xy, xy_, cell0_, cell0, cell1_, cell1;
         var value_, value;
@@ -89,6 +96,8 @@ Ext.define('BDC.view.View', {
 
         haltPanel = this.haltPanel();
         haltPanel.clearHalt();
+
+        flagsPanel = this.flagsPanel();
 
         ac0 = registersPanel.ac0;
         ac1 = registersPanel.ac1;
@@ -170,10 +179,12 @@ Ext.define('BDC.view.View', {
             case 5:      // add to accumulator
                 this.of = acc + value > 100;
                 registersPanel.setACCN((acc + value_) % 100);
+                flagsPanel.setOverflow(this.of);
                 break;
             case 6:      // subtract from accumulator
                 this.of = acc < value;
                 registersPanel.setACCN((100 + acc - value_) % 100);
+                flagsPanel.setOverflow(this.of);
                 break;
             case 7:      // store accumulator
                 if (xy !== 0) {
@@ -192,6 +203,7 @@ Ext.define('BDC.view.View', {
                 } else {
                     registersPanel.setACCN(value_);
                 }
+                flagsPanel.setOverflow(this.of);
                 break;
             case 9:      // decrement memory value
                 this.of = value === 0;
@@ -204,6 +216,7 @@ Ext.define('BDC.view.View', {
                 } else {
                     registersPanel.setACCN(value_);
                 }
+                flagsPanel.setOverflow(this.of);
                 break;
         }
 
