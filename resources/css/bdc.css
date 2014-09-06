@@ -6,6 +6,13 @@
     background-image: url(../images/cpu.png) !important;
 }
 
+.halt-icon {
+    background-image: url(../images/halt.png) !important;
+    background-repeat: no-repeat;
+    width: 48px;
+    height: 48px;
+}
+
 .load-icon {
     background-image: url(../images/load.png) !important;
 }

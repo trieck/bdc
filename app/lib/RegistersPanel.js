@@ -3,10 +3,8 @@ Ext.define('BDC.lib.RegistersPanel', {
     alias: 'widget.registers-panel',
     requires: [ 'BDC.lib.DigitValidator' ],
     title: 'CPU Registers',
-    columnWidth: 0.2,
     layout: 'vbox',
     bodyPadding: 10,
-    padding: '10px',
     ac0: 0, ac1: 0,
     pc0: 0, pc1: 0,
     ir0: 0, ir1: 0, ir2: 0,
@@ -73,11 +71,6 @@ Ext.define('BDC.lib.RegistersPanel', {
                 }
             },
             width: 75
-        },
-        {
-            itemId: 'haltText',
-            html: 'HALTED',
-            baseCls: 'x-panel-header-text-container-default'
         }
     ],
 
@@ -155,11 +148,6 @@ Ext.define('BDC.lib.RegistersPanel', {
         }
     },
 
-    clearHalt: function () {
-        var component = this.getComponent('haltText');
-        component.setVisible(false);
-    },
-
     incPC: function () {
         var pc = this.getComponent('PC');
 
@@ -198,10 +186,5 @@ Ext.define('BDC.lib.RegistersPanel', {
 
         component = this.getComponent('IR');
         component.setValue('' + this.ir2 + '' + this.ir1 + '' + this.ir0);
-    },
-
-    setHalt: function () {
-        var component = this.getComponent('haltText');
-        component.setVisible(true);
     }
 });

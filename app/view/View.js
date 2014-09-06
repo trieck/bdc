@@ -1,7 +1,7 @@
 Ext.define('BDC.view.View', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.bdc-view',
-    requires: [ 'BDC.lib.ButtonsPanel', 'BDC.lib.MemoryPanel', 'BDC.lib.RegistersPanel' ],
+    requires: [ 'BDC.lib.ButtonsPanel', 'BDC.lib.MemoryPanel', 'BDC.lib.StatusPanel' ],
     uses: [ 'BDC.lib.Colors'],
     width: 600,
     height: 350,
@@ -19,17 +19,27 @@ Ext.define('BDC.view.View', {
             itemId: 'memoryPanel'
         },
         {
-            xtype: 'registers-panel',
-            itemId: 'registersPanel'
+            xtype: 'status-panel',
+            itemId: 'statusPanel'
         }
     ],
+
+    registersPanel: function() {
+        return Ext.ComponentQuery.query('#registersPanel')[0];
+    },
+
+    haltPanel: function() {
+        return Ext.ComponentQuery.query('#haltPanel')[0];
+    },
 
     reset: function () {
         var panel = this.getComponent('memoryPanel');
         panel.clear();
 
-        panel = this.getComponent('registersPanel');
+        panel = this.registersPanel();
         panel.clear();
+
+        panel = this.haltPanel();
         panel.clearHalt();
 
         this.of = false;
@@ -66,7 +76,7 @@ Ext.define('BDC.view.View', {
     },
 
     step: function () {
-        var memoryPanel, registersPanel;
+        var memoryPanel, registersPanel, haltPanel;
         var acc, ac0, ac1, pc, pc0, pc1, ir0, ir1, ir2;
         var xy, xy_, cell0_, cell0, cell1_, cell1;
         var value_, value;
@@ -74,9 +84,11 @@ Ext.define('BDC.view.View', {
         memoryPanel = this.getComponent('memoryPanel');
         memoryPanel.resetGray();
 
-        registersPanel = this.getComponent('registersPanel');
+        registersPanel = this.registersPanel();
         registersPanel.setAll();
-        registersPanel.clearHalt();
+
+        haltPanel = this.haltPanel();
+        haltPanel.clearHalt();
 
         ac0 = registersPanel.ac0;
         ac1 = registersPanel.ac1;
@@ -130,7 +142,7 @@ Ext.define('BDC.view.View', {
                     registersPanel.setPCN(pc + xy);
                 else {
                     registersPanel.setPCN(pc + 97);
-                    registersPanel.setHalt();
+                    haltPanel.setHalt();
                 }
                 break;
             case 1:      // branch on overflow
@@ -138,7 +150,7 @@ Ext.define('BDC.view.View', {
                     registersPanel.setPCN(pc + xy);
                 else {
                     registersPanel.setPCN(pc + 97);
-                    registersPanel.setHalt();
+                    haltPanel.setHalt();
                 }
                 break;
             case 2:      // branch on not overflow
@@ -146,7 +158,7 @@ Ext.define('BDC.view.View', {
                     registersPanel.setPCN(pc + xy);
                 else {
                     registersPanel.setPCN(pc + 97);
-                    registersPanel.setHalt();
+                    haltPanel.setHalt();
                 }
                 break;
             case 3:      // load immediate accumulator
@@ -213,7 +225,7 @@ Ext.define('BDC.view.View', {
     loadProgram: function (program) {
         var memoryPanel, registersPanel, i, j, n = 0, pc0, pc1, pc;
         memoryPanel = this.getComponent('memoryPanel');
-        registersPanel = this.getComponent('registersPanel');
+        registersPanel = this.registersPanel();
 
         this.reset();
 
