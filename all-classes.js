@@ -15,7 +15,22 @@ Ext.define('BDC.lib.ButtonsPanel', {
     items: [
         {
             border: false,
-            flex: 0.5
+            flex: 0.2
+        },
+        {
+            xtype: 'button',
+            tooltip: { text: 'Launch Assembler Editor' },
+            text: 'ASSEMBLER',
+            focusCls: '',
+            id: 'assemblerButton',
+            iconCls: 'assemble-icon',
+            iconAlign: 'top',
+            width: '80%',
+            flex: 0.6
+        },
+        {
+            border: false,
+            flex: 0.2
         },
         {
             xtype: 'button',
@@ -30,7 +45,7 @@ Ext.define('BDC.lib.ButtonsPanel', {
         },
         {
             border: false,
-            flex: 0.5
+            flex: 0.2
         },
         {
             xtype: 'button',
@@ -45,7 +60,7 @@ Ext.define('BDC.lib.ButtonsPanel', {
         },
         {
             border: false,
-            flex: 0.5
+            flex: 0.2
         },
         {
             xtype: 'button',
@@ -110,7 +125,7 @@ Ext.define('BDC.lib.ButtonsPanel', {
         },
         {
             border: false,
-            flex: 1
+            flex: 0.2
         }
     ]
 });
@@ -141,26 +156,21 @@ Ext.define('BDC.lib.MemoryPanel', {
 
         for (i = 0; i < 11; ++i) {
             if (i === 0) {
-                this.add({
-                    border: false,
-                    width: 60
-                });
+                this.add({ border: false });
             } else {
                 this.add({
-                    fieldCls: 'memory-bold-cell',
+                    baseCls: 'memory-col-header',
                     html: '' + (i - 1),
-                    padding: '2 5 25 11',
-                    border: false
+                    padding: '10 5 7 11'
                 });
             }
         }
         for (i = 0, j = 0; i < 100; ++i) {
             if (i % 10 === 0) {
                 this.add({
-                    fieldCls: 'memory-bold-cell',
+                    baseCls: 'memory-row-header',
                     html: '' + j++,
-                    padding: '0 0 0 10',
-                    border: false
+                    padding: '0 15 0 10'
                 });
             }
 
@@ -263,15 +273,96 @@ Ext.define('BDC.lib.MemoryPanel', {
 
 
 
+Ext.define('BDC.lib.FlagsPanel', {
+    extend: 'Ext.panel.Panel',
+    alias: 'widget.flags-panel',
+    title: 'CPU Flags',
+    layout: 'vbox',
+    bodyPadding: 10,
+    padding: '10 0 0 0',
+    items: [
+        {
+            itemId: 'overflow-flag',
+            html: 'OF:',
+            baseCls: 'register-label',
+            width: 75
+        }
+    ],
+
+    setOverflow: function (flag) {
+        var component = this.getComponent('overflow-flag');
+
+        if (flag === true) {
+            component.update('OF: 1');
+        } else {
+            component.update('OF: 0');
+        }
+    }
+});
+
+Ext.define('BDC.lib.HaltPanel', {
+    extend: 'Ext.panel.Panel',
+    alias: 'widget.halt-panel',
+    border: false,
+    padding: '10 0 0 0',
+    items: [
+        {
+            xtype: 'image',
+            cls: 'halt-icon',
+            title: 'Halted'
+        }
+    ],
+
+    clearHalt: function () {
+        this.setVisible(false);
+    },
+
+    setHalt: function () {
+        this.setVisible(true);
+    }
+});
+
+Ext.define('BDC.lib.DigitValidator', function () {
+
+    Ext.apply(Ext.form.field.VTypes, {
+        pattern: /^[0-9]$/,
+
+        digit: function (val, field) {
+            return this.pattern.test(val);
+        },
+        digitMask: /[0-9]/
+    });
+
+    Ext.apply(Ext.form.field.VTypes, {
+        pattern: /^[0-9]*[0-9]$/,
+
+        'two-digits': function (val, field) {
+            return this.pattern.test(val);
+        },
+        'two-digitsMask': /[0-9]/
+    });
+
+    Ext.apply(Ext.form.field.VTypes, {
+        pattern: /^[0-9]*[0-9]*[0-9]$/,
+
+        'three-digits': function (val, field) {
+            return this.pattern.test(val);
+        },
+
+        'three-digitsMask': /[0-9]/
+    });
+
+    return this;
+}());
+
+
 Ext.define('BDC.lib.RegistersPanel', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.registers-panel',
-    uses: [ 'BDC.lib.DigitValidator' ],
+    requires: [ 'BDC.lib.DigitValidator' ],
     title: 'CPU Registers',
-    columnWidth: 0.2,
     layout: 'vbox',
     bodyPadding: 10,
-    padding: '10px',
     ac0: 0, ac1: 0,
     pc0: 0, pc1: 0,
     ir0: 0, ir1: 0, ir2: 0,
@@ -281,6 +372,7 @@ Ext.define('BDC.lib.RegistersPanel', {
             itemId: 'ACC',
             fieldLabel: 'A:',
             fieldCls: 'memory-cell',
+            labelCls: 'register-label',
             labelWidth: 20,
             minLength: 1,
             maxLength: 2,
@@ -295,14 +387,14 @@ Ext.define('BDC.lib.RegistersPanel', {
                         this.setValue(value.slice(0, 2));
                 }
             },
-            width: 75,
-            padding: '35 0 0 0'
+            width: 75
         },
         {
             xtype: 'textfield',
             itemId: 'PC',
             fieldLabel: 'PC:',
             fieldCls: 'memory-cell',
+            labelCls: 'register-label',
             labelWidth: 20,
             minLength: 1,
             maxLength: 2,
@@ -324,6 +416,7 @@ Ext.define('BDC.lib.RegistersPanel', {
             itemId: 'IR',
             fieldLabel: 'IR:',
             fieldCls: 'memory-cell',
+            labelCls: 'register-label',
             labelWidth: 20,
             minLength: 1,
             maxLength: 3,
@@ -339,11 +432,6 @@ Ext.define('BDC.lib.RegistersPanel', {
                 }
             },
             width: 75
-        },
-        {
-            itemId: 'haltText',
-            html: 'HALTED',
-            baseCls: 'x-panel-header-text-container-default'
         }
     ],
 
@@ -421,11 +509,6 @@ Ext.define('BDC.lib.RegistersPanel', {
         }
     },
 
-    clearHalt: function () {
-        var component = this.getComponent('haltText');
-        component.setVisible(false);
-    },
-
     incPC: function () {
         var pc = this.getComponent('PC');
 
@@ -464,20 +547,46 @@ Ext.define('BDC.lib.RegistersPanel', {
 
         component = this.getComponent('IR');
         component.setValue('' + this.ir2 + '' + this.ir1 + '' + this.ir0);
-    },
-
-    setHalt: function () {
-        var component = this.getComponent('haltText');
-        component.setVisible(true);
     }
+});
+
+Ext.define('BDC.lib.StatusPanel', {
+    extend: 'Ext.panel.Panel',
+    alias: 'widget.status-panel',
+    requires: [
+        'BDC.lib.RegistersPanel',
+        'BDC.lib.FlagsPanel',
+        'BDC.lib.HaltPanel'
+    ],
+    columnWidth: 0.2,
+    layout: {
+        type: 'vbox',
+        align: 'center'
+    },
+    padding: '10px',
+    border: false,
+    items: [
+        {
+            xtype: 'registers-panel',
+            itemId: 'registersPanel'
+        },
+        {
+            xtype: 'flags-panel',
+            itemId: 'flagsPanel'
+        },
+        {
+            xtype: 'halt-panel',
+            itemId: 'haltPanel'
+        }
+    ]
 });
 
 Ext.define('BDC.view.View', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.bdc-view',
-    requires: [ 'BDC.lib.ButtonsPanel', 'BDC.lib.MemoryPanel', 'BDC.lib.RegistersPanel' ],
+    requires: [ 'BDC.lib.ButtonsPanel', 'BDC.lib.MemoryPanel', 'BDC.lib.StatusPanel' ],
     uses: [ 'BDC.lib.Colors'],
-    width: 650,
+    width: 600,
     height: 350,
     border: false,
     of: false,  // overflow
@@ -493,20 +602,37 @@ Ext.define('BDC.view.View', {
             itemId: 'memoryPanel'
         },
         {
-            xtype: 'registers-panel',
-            itemId: 'registersPanel'
+            xtype: 'status-panel',
+            itemId: 'statusPanel'
         }
     ],
+
+    registersPanel: function () {
+        return Ext.ComponentQuery.query('#registersPanel')[0];
+    },
+
+    haltPanel: function () {
+        return Ext.ComponentQuery.query('#haltPanel')[0];
+    },
+
+    flagsPanel: function () {
+        return Ext.ComponentQuery.query('#flagsPanel')[0];
+    },
 
     reset: function () {
         var panel = this.getComponent('memoryPanel');
         panel.clear();
 
-        panel = this.getComponent('registersPanel');
+        panel = this.registersPanel();
         panel.clear();
+
+        panel = this.haltPanel();
         panel.clearHalt();
 
         this.of = false;
+
+        panel = this.flagsPanel();
+        panel.setOverflow(this.of);
     },
 
     highlightInstruction: function (pc, color) {
@@ -540,7 +666,7 @@ Ext.define('BDC.view.View', {
     },
 
     step: function () {
-        var memoryPanel, registersPanel;
+        var memoryPanel, registersPanel, haltPanel, flagsPanel;
         var acc, ac0, ac1, pc, pc0, pc1, ir0, ir1, ir2;
         var xy, xy_, cell0_, cell0, cell1_, cell1;
         var value_, value;
@@ -548,9 +674,13 @@ Ext.define('BDC.view.View', {
         memoryPanel = this.getComponent('memoryPanel');
         memoryPanel.resetGray();
 
-        registersPanel = this.getComponent('registersPanel');
+        registersPanel = this.registersPanel();
         registersPanel.setAll();
-        registersPanel.clearHalt();
+
+        haltPanel = this.haltPanel();
+        haltPanel.clearHalt();
+
+        flagsPanel = this.flagsPanel();
 
         ac0 = registersPanel.ac0;
         ac1 = registersPanel.ac1;
@@ -604,7 +734,7 @@ Ext.define('BDC.view.View', {
                     registersPanel.setPCN(pc + xy);
                 else {
                     registersPanel.setPCN(pc + 97);
-                    registersPanel.setHalt();
+                    haltPanel.setHalt();
                 }
                 break;
             case 1:      // branch on overflow
@@ -612,7 +742,7 @@ Ext.define('BDC.view.View', {
                     registersPanel.setPCN(pc + xy);
                 else {
                     registersPanel.setPCN(pc + 97);
-                    registersPanel.setHalt();
+                    haltPanel.setHalt();
                 }
                 break;
             case 2:      // branch on not overflow
@@ -620,7 +750,7 @@ Ext.define('BDC.view.View', {
                     registersPanel.setPCN(pc + xy);
                 else {
                     registersPanel.setPCN(pc + 97);
-                    registersPanel.setHalt();
+                    haltPanel.setHalt();
                 }
                 break;
             case 3:      // load immediate accumulator
@@ -632,10 +762,12 @@ Ext.define('BDC.view.View', {
             case 5:      // add to accumulator
                 this.of = acc + value > 100;
                 registersPanel.setACCN((acc + value_) % 100);
+                flagsPanel.setOverflow(this.of);
                 break;
             case 6:      // subtract from accumulator
                 this.of = acc < value;
                 registersPanel.setACCN((100 + acc - value_) % 100);
+                flagsPanel.setOverflow(this.of);
                 break;
             case 7:      // store accumulator
                 if (xy !== 0) {
@@ -654,6 +786,7 @@ Ext.define('BDC.view.View', {
                 } else {
                     registersPanel.setACCN(value_);
                 }
+                flagsPanel.setOverflow(this.of);
                 break;
             case 9:      // decrement memory value
                 this.of = value === 0;
@@ -666,6 +799,7 @@ Ext.define('BDC.view.View', {
                 } else {
                     registersPanel.setACCN(value_);
                 }
+                flagsPanel.setOverflow(this.of);
                 break;
         }
 
@@ -687,7 +821,7 @@ Ext.define('BDC.view.View', {
     loadProgram: function (program) {
         var memoryPanel, registersPanel, i, j, n = 0, pc0, pc1, pc;
         memoryPanel = this.getComponent('memoryPanel');
-        registersPanel = this.getComponent('registersPanel');
+        registersPanel = this.registersPanel();
 
         this.reset();
 
@@ -706,21 +840,43 @@ Ext.define('BDC.view.View', {
         pc1 = registersPanel.pc1;
         pc = pc0 + 10 * pc1;
         this.highlightInstruction(pc, BDC.lib.Colors.MAGENTA);
+    },
+
+    loadAssembledProgram: function (program) {
+        var memoryPanel, i, j, n = 0;
+        memoryPanel = this.getComponent('memoryPanel');
+
+        this.reset();
+
+        for (i = 0; i < 10; i++) {
+            for (j = 0; j < 10; j++) {
+                memoryPanel.setCellValue(i, j, program[n++]);
+            }
+        }
+
+        this.highlightInstruction(0, BDC.lib.Colors.MAGENTA);
     }
 });
 
 Ext.define('BDC.controller.Controller', {
     extend: 'Ext.app.Controller',
-    uses: ['BDC.lib.Programs'],
+    uses: ['BDC.lib.Programs', 'BDC.lib.AssemblerEditor'],
     views: [ 'BDC.view.View' ],
     refs: [
-        { selector: 'bdc-view', ref: 'BDCView' }
+        { selector: 'bdc-view', ref: 'BDCView' },
+        { selector: 'panel[itemId=bdc-assembler]', ref: 'Assembler' }
     ],
 
     init: function () {
         this.control({
             'bdc-view': {
                 afterrender: this.onViewAfterRender
+            },
+            '#assemblerButton': {
+                click: this.onAssembler
+            },
+            '#assembleButton': {
+                click: this.onAssemble
             },
             '#resetButton': {
                 click: this.onReset
@@ -751,6 +907,25 @@ Ext.define('BDC.controller.Controller', {
 
     onViewAfterRender: function (view) {
         view.reset();
+    },
+
+    onAssembler: function () {
+        BDC.lib.AssemblerEditor.show();
+    },
+
+    onAssemble: function () {
+        var memory, message, editor = this.getAssembler();
+        var view = this.getBDCView();
+
+        try {
+            memory = editor.assemble();
+        } catch (e) {
+            message = Ext.String.format("Error: {0}, Line: {1}", e.error, e.line_no);
+            Ext.Msg.alert(message);
+            return;
+        }
+
+        view.loadAssembledProgram(memory);
     },
 
     onReset: function () {
@@ -795,40 +970,6 @@ Ext.define('BDC.lib.Colors', {
         MAGENTA: 'FF00FF'
     }
 });
-Ext.define('BDC.lib.DigitValidator', function () {
-
-    Ext.apply(Ext.form.field.VTypes, {
-        pattern: /^[0-9]$/,
-
-        digit: function (val, field) {
-            return this.pattern.test(val);
-        },
-        digitMask: /[0-9]/
-    });
-
-    Ext.apply(Ext.form.field.VTypes, {
-        pattern: /^[0-9]*[0-9]$/,
-
-        'two-digits': function (val, field) {
-            return this.pattern.test(val);
-        },
-        'two-digitsMask': /[0-9]/
-    });
-
-    Ext.apply(Ext.form.field.VTypes, {
-        pattern: /^[0-9]*[0-9]*[0-9]$/,
-
-        'three-digits': function (val, field) {
-            return this.pattern.test(val);
-        },
-
-        'three-digitsMask': /[0-9]/
-    });
-
-    return this;
-}());
-
-
 Ext.define('BDC.lib.Programs', {
     statics: {
         PROGRAM_ONE: [0, 0, 0,
@@ -899,12 +1040,575 @@ Ext.define('BDC.lib.Programs', {
             0, 0, 0, 0, 0, 0, 0, 4, 4, 0]
     }
 });
+/**
+ * BDC Assembler class
+ */
+Ext.define('BDC.lib.Assembler', {
+    uses: [ 'BDC.lib.Character' ],
+    statics: {
+        PROGRAM_SIZE: 100,
+        MNEMONICS: {
+            halt: -1,   // halt the machine
+            j: 0,       // branch unconditionally
+            jo: 1,      // branch if overflow
+            jno: 2,     // branch unless overflow
+            loadi: 3,   // load immediate value to .A
+            load: 4,    // load value in memory to .A
+            add: 5,     // add value in memory to .A
+            sub: 6,     // subtract value in memory from .A
+            store: 7,   // copy .A to memory
+            inc: 8,     // increment value at memory address
+            dec: 9      // decrement value at memory address
+        },
+
+        TT_EMPTY: 0,    // empty token
+        TT_ID: 1,       // identifier token
+        TT_NUMBER: 2,   // numeric token
+        TT_LABEL: 3,    // label token
+
+        PSEUDO_REGS: {
+            q: 80,
+            r: 82,
+            s: 84,
+            t: 86,
+            u: 88,
+            v: 90,
+            w: 92,
+            x: 94,
+            y: 96,
+            z: 98
+        }
+    },
+
+    memory: [],     // memory to assemble to
+    symbols: {},    // symbol table
+    refs: [],       // forward reference list
+    program: '',    // input program
+    token: '',      // current input token
+    i_index: 0,     // current input index
+    o_index: 0,     // current index into memory
+    line_no: 0,     // current line number
+
+    /**
+     * Initialize assembler
+     * @private
+     */
+    initialize: function () {
+        this.memory = Array.apply(null, new Array(this.self.PROGRAM_SIZE)).map(Number.prototype.valueOf, 0);
+        this.symbols = {};
+        this.refs = [];
+        this.i_index = this.o_index = 0;
+        this.line_no = 1;
+        this.token = this.program = '';
+    },
+
+    constructor: function () {
+        this.initialize();
+    },
+
+    /**
+     * Assemble input program
+     * @public
+     * @param program
+     * @returns {Array} assembled program
+     */
+    assemble: function (program) {
+        this.initialize();
+        this.program = program.toLowerCase();
+        this.parse();
+        this.resolve();
+        return this.memory;
+    },
+
+    /**
+     * Parse input program
+     * @private
+     */
+    parse: function () {
+        this.i_index = 0;
+        var tt;
+
+        while ((tt = this.getToken()) !== this.self.TT_EMPTY) {
+            switch (tt) {
+                case this.self.TT_LABEL:    // label definition
+                    this.label();
+                    break;
+                case this.self.TT_ID:       // instruction
+                    this.instruction();
+                    break;
+                default:                    // error
+                    this.syntax_error();
+                    break;
+            }
+        }
+    },
+
+    /**
+     * Resolve forward references
+     * @private
+     */
+    resolve: function () {
+
+        Ext.each(this.refs, function (ref) {
+            var value, message;
+            if ((value = this.symbols[ref.name]) === undefined) {
+                message = Ext.String.format('can\'t find label {0}.', ref.name);
+                throw { error: message, line_no: ref.line_no };
+            }
+            // calculate real offset
+            value = value - ref.location - 3;
+            value = ((value % this.self.PROGRAM_SIZE) + this.self.PROGRAM_SIZE) % this.self.PROGRAM_SIZE;
+            this.memory[ref.location] = value % 10;
+            this.memory[ref.location + 1] = Math.floor(value / 10);
+        }, this);
+    },
+
+    /**
+     * Get next token from input
+     * @private
+     */
+    getToken: function () {
+        var c, length = this.program.length;
+        var tt = this.self.TT_EMPTY;
+
+        for (this.token = ''; this.i_index < length; ++this.i_index) {
+            c = this.program[this.i_index];
+            switch (c) {
+                case ' ':   // whitespace delimiter
+                case '\t':
+                case '\r':
+                    if (this.token.length) {
+                        return tt;
+                    }
+                    break;
+                case ':':   // label definition
+                    if (this.token.length) {
+                        return this.self.TT_LABEL;
+                    }
+                    break;
+                case ';':   // comment
+                    this.comment(); // eat
+                    break;
+                case '\n':  // new line
+                    this.line_no++;
+                    if (this.token.length) {
+                        return tt;
+                    }
+                    break;
+                default:
+                    if (BDC.lib.Character.isdigit(c)) {
+                        if (tt === this.self.TT_EMPTY) {
+                            tt = this.self.TT_NUMBER;
+                        }
+                        this.token += c;
+                        continue;
+                    } else if (BDC.lib.Character.isalpha(c)) {
+                        tt = this.self.TT_ID;
+                        this.token += c;
+                        continue;
+                    } else {
+                        this.syntax_error();
+                    }
+                    break;
+            }
+        }
+
+        return tt;
+    },
+
+    /**
+     * Generate instruction
+     * @private
+     */
+    instruction: function () {
+        var instr;
+
+        if (this.token.length === 0) {
+            this.syntax_error();
+        }
+
+        if ((instr = this.self.MNEMONICS[this.token]) === undefined) {
+            this.syntax_error();
+        }
+
+        this.assemble_instr(instr);
+    },
+
+    /**
+     * Assemble instruction
+     * @param instr
+     */
+    assemble_instr: function (instr) {
+        switch (instr) {
+            case this.self.MNEMONICS.halt:  // halt
+                this.halt();
+                break;
+            case this.self.MNEMONICS.j:     // branch
+                this.jump();
+                break;
+            case this.self.MNEMONICS.jo:    // branch on overflow
+                this.jo();
+                break;
+            case this.self.MNEMONICS.jno:    // branch unless overflow
+                this.jno();
+                break;
+            case this.self.MNEMONICS.loadi: // load immediate
+                this.loadi();
+                break;
+            case this.self.MNEMONICS.load:  // load value in memory to accumulator
+                this.load();
+                break;
+            case this.self.MNEMONICS.add:   // add value in memory to accumulator
+                this.add();
+                break;
+            case this.self.MNEMONICS.sub:   // subtract value in memory from accumulator
+                this.sub();
+                break;
+            case this.self.MNEMONICS.store: // store accumulator to memory
+                this.store();
+                break;
+            case this.self.MNEMONICS.inc:   // increment value in memory
+                this.inc();
+                break;
+            case this.self.MNEMONICS.dec:   // decremement value in memory
+                this.dec();
+                break;
+        }
+    },
+
+    /**
+     * Assemble value
+     * @param value
+     * @private
+     */
+    assemble_val: function (value) {
+        this.memory[this.o_index++] = value % 10;
+        this.memory[this.o_index++] = Math.floor(value / 10);
+    },
+
+    /**
+     * Halt
+     * @private
+     */
+    halt: function () {
+        this.assemble_val(0);
+        this.memory[this.o_index++] = this.self.MNEMONICS.j;
+    },
+
+    /**
+     * Jump
+     * @private
+     */
+    jump: function () {
+        var value = this.getLocation();
+        this.assemble_val(value);
+        this.memory[this.o_index++] = this.self.MNEMONICS.j;
+    },
+
+    /**
+     * Jump if overflow set
+     * @private
+     */
+    jo: function () {
+        var value = this.getLocation();
+        this.assemble_val(value);
+        this.memory[this.o_index++] = this.self.MNEMONICS.jo;
+    },
+
+    /**
+     * Jump unless overflow set
+     * @private
+     */
+    jno: function () {
+        var value = this.getLocation();
+        this.assemble_val(value);
+        this.memory[this.o_index++] = this.self.MNEMONICS.jno;
+    },
+
+
+    /**
+     * Load memory to accumulator
+     * @private
+     */
+    load: function () {
+        var value = this.getAbsolute();
+        this.assemble_val(value);
+        this.memory[this.o_index++] = this.self.MNEMONICS.load;
+    },
+
+    /**
+     * Load immediate value to accumulator
+     * @private
+     */
+    loadi: function () {
+        var value = this.getImmediate();
+        this.assemble_val(value);
+        this.memory[this.o_index++] = this.self.MNEMONICS.loadi;
+    },
+
+    /**
+     * Store accumulator to memory
+     * @private
+     */
+    store: function () {
+        var value = this.getAbsolute();
+        this.assemble_val(value);
+        this.memory[this.o_index++] = this.self.MNEMONICS.store;
+    },
+
+    /**
+     * Add value in memory to accumulator
+     * @private
+     */
+    add: function () {
+        var value = this.getAbsolute();
+        this.assemble_val(value);
+        this.memory[this.o_index++] = this.self.MNEMONICS.add;
+    },
+
+    /**
+     * Subtract value in memory from accumulator
+     * @private
+     */
+    sub: function () {
+        var value = this.getAbsolute();
+        this.assemble_val(value);
+        this.memory[this.o_index++] = this.self.MNEMONICS.sub;
+    },
+
+    /**
+     * Increment a value in memory
+     * @private
+     */
+    inc: function () {
+        var value = this.getAbsolute();
+        this.assemble_val(value);
+        this.memory[this.o_index++] = this.self.MNEMONICS.inc;
+    },
+
+    /**
+     * Decrement a value in memory
+     * @private
+     */
+    dec: function () {
+        var value = this.getAbsolute();
+        this.assemble_val(value);
+        this.memory[this.o_index++] = this.self.MNEMONICS.dec;
+    },
+
+    /**
+     * Get immediate value
+     * @private
+     * @returns {Number}
+     */
+    getImmediate: function () {
+        var tt = this.getToken();
+        if (tt !== this.self.TT_NUMBER)
+            this.syntax_error();
+
+        return this.parseValue();
+    },
+
+    /**
+     * Parse token value
+     * @returns {Number}
+     */
+    parseValue: function () {
+        var value = parseInt(this.token, 10);
+        if (isNaN(value)) {
+            this.syntax_error();
+        }
+
+        if (0 > value || value > 99)
+            this.error('number out of range.');
+
+        return value;
+    },
+
+    /**
+     * Get absolute value
+     * @private
+     * @return {Number}
+     */
+    getAbsolute: function () {
+        var value, tt = this.getToken();
+        if (tt !== this.self.TT_NUMBER && tt !== this.self.TT_ID) {
+            this.syntax_error();
+        }
+
+        if (tt === this.self.TT_NUMBER) {
+            return this.parseValue();
+        }
+
+        if ((value = this.self.PSEUDO_REGS[this.token]) === undefined) {
+            this.error('undefined symbol');
+        }
+
+        return value;
+    },
+
+    /**
+     * Get memory location or symbol table value
+     */
+    getLocation: function () {
+        var value, tt = this.getToken();
+        if (tt !== this.self.TT_NUMBER && tt !== this.self.TT_ID)
+            this.syntax_error();
+
+        if (tt === this.self.TT_NUMBER)
+            return this.parseValue();
+
+        if ((value = this.symbols[this.token]) !== undefined) {
+            // calculate real offset
+            value = ((this.self.PROGRAM_SIZE - this.o_index) + value) - 3;
+            value = ((value % this.self.PROGRAM_SIZE) + this.self.PROGRAM_SIZE) % this.self.PROGRAM_SIZE;
+            return value;
+        }
+
+        // undefined, generate a forward reference
+        this.refs.push({ name: this.token, location: this.o_index, line_no: this.line_no });
+
+        return 0;
+    },
+
+    /**
+     * Parse comment
+     * @private
+     */
+    comment: function () {
+        var c, length = this.program.length;
+        for (; this.i_index < length; ++this.i_index) {
+            c = this.program[this.i_index];
+            if (c === '\n') {
+                this.i_index--; // un-read
+                return;
+            }
+        }
+    },
+
+    /**
+     * Define a label
+     * @private
+     */
+    label: function () {
+        if (this.token.length === 0) {
+            this.syntax_error();
+        }
+
+        // can't re-define a label
+        if (this.symbols[this.token] !== undefined) {
+            this.error('label already defined.');
+        }
+
+        // can't be a pseudo register
+        if (this.self.PSEUDO_REGS[this.token] !== undefined) {
+            this.error('illegal label.');
+        }
+
+        this.symbols[this.token] = this.o_index;
+    },
+
+    /**
+     * Throw a syntax error
+     */
+    syntax_error: function () {
+        this.error('syntax error.');
+    },
+
+    /**
+     * Throw an error with string description
+     * @param str
+     */
+    error: function (str) {
+        throw { error: str, line_no: this.line_no };
+    }
+});
+
+Ext.define('BDC.lib.AssemblerEditor', {
+    extend: 'Ext.panel.Panel',
+    requires: 'BDC.lib.Assembler',
+    itemId: 'bdc-assembler',
+    title: 'BDC Assembler',
+    renderTo: 'bdc-app',
+    iconCls: 'assemble-icon',
+    closable: true,
+    width: 600,
+    height: 375,
+    collapsible: true,
+    statics: {
+        show: function () {
+            if (Ext.ComponentQuery.query('panel[itemId=bdc-assembler]')[0])
+                return; // shown
+            return Ext.create('BDC.lib.AssemblerEditor');
+        }
+    },
+
+    dockedItems: [
+        {
+            xtype: 'toolbar',
+            items: [
+                {
+                    xtype: 'button',
+                    tooltip: { text: 'Assemble Source Code', title: 'Assemble'},
+                    text: 'Assemble Source Code',
+                    iconCls: 'assemble-icon',
+                    focusCls: '',
+                    id: 'assembleButton'
+                }
+            ]
+        }
+    ],
+
+    items: [
+        {
+            xtype: 'textarea',
+            itemId: 'assembler-text',
+            width: 600,
+            height: 375,
+            fieldStyle: {
+                'fontFamily': 'courier new',
+                'fontSize': '14px'
+            },
+            validationEvent: false,
+            enableKeyEvents: true,
+            listeners: {
+                keydown: function (field, e) {
+                    if (e.getKey() === e.TAB) {
+                        e.stopEvent();
+                        field.insertTab();
+                    }
+                }
+            },
+            insertTab: function () {
+                var el = this.inputEl.dom;
+                if (el.setSelectionRange) {
+                    var withIns = el.value.substring(0, el.selectionStart) + '\t';
+                    var pos = withIns.length;
+                    el.value = withIns + el.value.substring(el.selectionEnd, el.value.length);
+                    el.setSelectionRange(pos, pos);
+                } else if (document.selection) {
+                    document.selection.createRange().text = '\t';
+                }
+            }
+        }
+    ],
+
+    assembler: Ext.create('BDC.lib.Assembler'),
+
+    assemble: function () {
+        var text = this.getComponent('assembler-text');
+        var value = text.getValue();
+        return this.assembler.assemble(value);
+    }
+});
+
 Ext.define('BDC.lib.Frame', {
     extend: 'Ext.panel.Panel',
     alias: 'bdc-frame',
     title: 'Basic Decimal Computer',
     renderTo: 'bdc-app',
-    width: 665,
+    iconCls: 'cpu-icon',
+    width: 600,
     height: 375,
     layout: 'fit',
     items: [
@@ -913,8 +1617,23 @@ Ext.define('BDC.lib.Frame', {
 
     initComponent: function () {
         Ext.QuickTips.init();
-        Ext.tip.Tip.prototype.minWidth = 200;
         this.callParent(arguments);
+    }
+});
+
+Ext.define('BDC.lib.Character', {
+    statics: {
+        isalpha: function (c) {
+            return (((c >= 'a') && (c <= 'z')) || ((c >= 'A') && (c <= 'Z')));
+        },
+
+        isdigit: function (c) {
+            return ((c >= '0') && (c <= '9'));
+        },
+
+        isalnum: function (c) {
+            return (this.isalpha(c) || this.isdigit(c));
+        }
     }
 });
 

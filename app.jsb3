@@ -20,8 +20,28 @@
                     "path": "app/lib/"
                 },
                 {
+                    "clsName": "BDC.lib.FlagsPanel",
+                    "name": "FlagsPanel.js",
+                    "path": "app/lib/"
+                },
+                {
+                    "clsName": "BDC.lib.HaltPanel",
+                    "name": "HaltPanel.js",
+                    "path": "app/lib/"
+                },
+                {
+                    "clsName": "BDC.lib.DigitValidator",
+                    "name": "DigitValidator.js",
+                    "path": "app/lib/"
+                },
+                {
                     "clsName": "BDC.lib.RegistersPanel",
                     "name": "RegistersPanel.js",
+                    "path": "app/lib/"
+                },
+                {
+                    "clsName": "BDC.lib.StatusPanel",
+                    "name": "StatusPanel.js",
                     "path": "app/lib/"
                 },
                 {
@@ -40,18 +60,28 @@
                     "path": "app/lib/"
                 },
                 {
-                    "clsName": "BDC.lib.DigitValidator",
-                    "name": "DigitValidator.js",
-                    "path": "app/lib/"
-                },
-                {
                     "clsName": "BDC.lib.Programs",
                     "name": "Programs.js",
                     "path": "app/lib/"
                 },
                 {
+                    "clsName": "BDC.lib.Assembler",
+                    "name": "Assembler.js",
+                    "path": "app/lib/"
+                },
+                {
+                    "clsName": "BDC.lib.AssemblerEditor",
+                    "name": "AssemblerEditor.js",
+                    "path": "app/lib/"
+                },
+                {
                     "clsName": "BDC.lib.Frame",
                     "name": "Frame.js",
+                    "path": "app/lib/"
+                },
+                {
+                    "clsName": "BDC.lib.Character",
+                    "name": "Character.js",
                     "path": "app/lib/"
                 }
             ]
