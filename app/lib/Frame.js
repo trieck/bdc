@@ -3,7 +3,8 @@ Ext.define('BDC.lib.Frame', {
     alias: 'bdc-frame',
     title: 'Basic Decimal Computer',
     renderTo: 'bdc-app',
-    width: 665,
+    iconCls: 'cpu-icon',
+    width: 600,
     height: 375,
     layout: 'fit',
     items: [
@@ -12,7 +13,6 @@ Ext.define('BDC.lib.Frame', {
 
     initComponent: function () {
         Ext.QuickTips.init();
-        Ext.tip.Tip.prototype.minWidth = 200;
         this.callParent(arguments);
     }
 });

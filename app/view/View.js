@@ -3,7 +3,7 @@ Ext.define('BDC.view.View', {
     alias: 'widget.bdc-view',
     requires: [ 'BDC.lib.ButtonsPanel', 'BDC.lib.MemoryPanel', 'BDC.lib.RegistersPanel' ],
     uses: [ 'BDC.lib.Colors'],
-    width: 650,
+    width: 600,
     height: 350,
     border: false,
     of: false,  // overflow

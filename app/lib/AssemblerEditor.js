@@ -6,7 +6,7 @@ Ext.define('BDC.lib.AssemblerEditor', {
     renderTo: 'bdc-app',
     iconCls: 'assemble-icon',
     closable: true,
-    width: 665,
+    width: 600,
     height: 375,
     collapsible: true,
     statics: {
@@ -37,7 +37,7 @@ Ext.define('BDC.lib.AssemblerEditor', {
         {
             xtype: 'textarea',
             itemId: 'assembler-text',
-            width: 665,
+            width: 600,
             height: 375,
             fieldStyle: {
                 'fontFamily': 'courier new',

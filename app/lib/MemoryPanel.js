@@ -24,26 +24,21 @@ Ext.define('BDC.lib.MemoryPanel', {
 
         for (i = 0; i < 11; ++i) {
             if (i === 0) {
-                this.add({
-                    border: false,
-                    width: 60
-                });
+                this.add({ border: false });
             } else {
                 this.add({
-                    fieldCls: 'memory-bold-cell',
+                    baseCls: 'memory-col-header',
                     html: '' + (i - 1),
-                    padding: '2 5 25 11',
-                    border: false
+                    padding: '10 5 7 11'
                 });
             }
         }
         for (i = 0, j = 0; i < 100; ++i) {
             if (i % 10 === 0) {
                 this.add({
-                    fieldCls: 'memory-bold-cell',
+                    baseCls: 'memory-row-header',
                     html: '' + j++,
-                    padding: '0 0 0 10',
-                    border: false
+                    padding: '0 15 0 10'
                 });
             }
 

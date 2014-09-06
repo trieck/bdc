@@ -30,8 +30,7 @@ Ext.define('BDC.lib.RegistersPanel', {
                         this.setValue(value.slice(0, 2));
                 }
             },
-            width: 75,
-            padding: '35 0 0 0'
+            width: 75
         },
         {
             xtype: 'textfield',

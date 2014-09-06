@@ -2,14 +2,23 @@
     background-image: url(../images/assemble.png) !important;
 }
 
+.cpu-icon {
+    background-image: url(../images/cpu.png) !important;
+}
+
 .load-icon {
     background-image: url(../images/load.png) !important;
 }
 
-.memory-bold-cell {
+.memory-col-header {
     font-family: "Menlo", "Courier New", "Courier", monospace;
     font-weight: 900;
-    text-align: center;
+}
+
+.memory-row-header {
+    font-family: "Menlo", "Courier New", "Courier", monospace;
+    font-weight: 900;
+    text-align: right;
     border: none;
 }
 
@@ -34,4 +43,16 @@
 
 .tape-icon {
     background-image: url(../images/tape.png) !important;
+}
+
+.x-tip {
+    width: auto !important;
+}
+
+.x-tip-body {
+    width: auto !important;
+}
+
+.x-tip-body span {
+    width: auto !important;
 }
