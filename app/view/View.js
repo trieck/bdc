@@ -177,12 +177,12 @@ Ext.define('BDC.view.View', {
                 registersPanel.setACCN(value_);
                 break;
             case 5:      // add to accumulator
-                this.of = acc + value > 100;
+                this.of = acc + value_ > 100;
                 registersPanel.setACCN((acc + value_) % 100);
                 flagsPanel.setOverflow(this.of);
                 break;
             case 6:      // subtract from accumulator
-                this.of = acc < value;
+                this.of = acc < value_;
                 registersPanel.setACCN((100 + acc - value_) % 100);
                 flagsPanel.setOverflow(this.of);
                 break;
@@ -193,7 +193,7 @@ Ext.define('BDC.view.View', {
                 }
                 break;
             case 8:      // increment memory value
-                this.of = value === 99;
+                this.of = value_ === 99;
                 value_ = (value_ + 1) % 100;
                 if (xy !== 0) {
                     cell1_ = Math.floor(value_ / 10);
@@ -206,7 +206,7 @@ Ext.define('BDC.view.View', {
                 flagsPanel.setOverflow(this.of);
                 break;
             case 9:      // decrement memory value
-                this.of = value === 0;
+                this.of = value_ === 0;
                 value_ = (value_ + 99) % 100;
                 if (xy !== 0) {
                     cell1_ = Math.floor(value_ / 10);

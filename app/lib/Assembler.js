@@ -23,6 +23,8 @@ Ext.define('BDC.lib.Assembler', {
         TT_ID: 1,       // identifier token
         TT_NUMBER: 2,   // numeric token
         TT_LABEL: 3,    // label token
+        TT_LBRACKET: 4, // left bracket
+        TT_RBRACKET: 5, // right bracket
 
         PSEUDO_REGS: {
             q: 80,
@@ -141,12 +143,29 @@ Ext.define('BDC.lib.Assembler', {
                     break;
                 case ':':   // label definition
                     if (this.token.length) {
+                        this.i_index++;
                         return this.self.TT_LABEL;
+                    } else {
+                        this.syntax_error();
                     }
                     break;
                 case ';':   // comment
-                    this.comment(); // eat
+                    this.comment();
                     break;
+                case '[':   // left bracket
+                    if (this.token.length) {
+                        return tt;
+                    }
+                    this.token = c;
+                    this.i_index++;
+                    return this.self.TT_LBRACKET;
+                case ']':   // right bracket
+                    if (this.token.length) {
+                        return tt;
+                    }
+                    this.token = c;
+                    this.i_index++;
+                    return this.self.TT_RBRACKET;
                 case '\n':  // new line
                     this.line_no++;
                     if (this.token.length) {
@@ -258,7 +277,7 @@ Ext.define('BDC.lib.Assembler', {
      * @private
      */
     jump: function () {
-        var value = this.getLocation();
+        var value = this.getTarget();
         this.assemble_val(value);
         this.memory[this.o_index++] = this.self.MNEMONICS.j;
     },
@@ -268,7 +287,7 @@ Ext.define('BDC.lib.Assembler', {
      * @private
      */
     jo: function () {
-        var value = this.getLocation();
+        var value = this.getTarget();
         this.assemble_val(value);
         this.memory[this.o_index++] = this.self.MNEMONICS.jo;
     },
@@ -278,7 +297,7 @@ Ext.define('BDC.lib.Assembler', {
      * @private
      */
     jno: function () {
-        var value = this.getLocation();
+        var value = this.getTarget();
         this.assemble_val(value);
         this.memory[this.o_index++] = this.self.MNEMONICS.jno;
     },
@@ -289,7 +308,7 @@ Ext.define('BDC.lib.Assembler', {
      * @private
      */
     load: function () {
-        var value = this.getAbsolute();
+        var value = this.getMemory();
         this.assemble_val(value);
         this.memory[this.o_index++] = this.self.MNEMONICS.load;
     },
@@ -309,7 +328,7 @@ Ext.define('BDC.lib.Assembler', {
      * @private
      */
     store: function () {
-        var value = this.getAbsolute();
+        var value = this.getMemory();
         this.assemble_val(value);
         this.memory[this.o_index++] = this.self.MNEMONICS.store;
     },
@@ -319,7 +338,7 @@ Ext.define('BDC.lib.Assembler', {
      * @private
      */
     add: function () {
-        var value = this.getAbsolute();
+        var value = this.getMemory();
         this.assemble_val(value);
         this.memory[this.o_index++] = this.self.MNEMONICS.add;
     },
@@ -329,7 +348,7 @@ Ext.define('BDC.lib.Assembler', {
      * @private
      */
     sub: function () {
-        var value = this.getAbsolute();
+        var value = this.getMemory();
         this.assemble_val(value);
         this.memory[this.o_index++] = this.self.MNEMONICS.sub;
     },
@@ -339,7 +358,7 @@ Ext.define('BDC.lib.Assembler', {
      * @private
      */
     inc: function () {
-        var value = this.getAbsolute();
+        var value = this.getMemory();
         this.assemble_val(value);
         this.memory[this.o_index++] = this.self.MNEMONICS.inc;
     },
@@ -349,7 +368,7 @@ Ext.define('BDC.lib.Assembler', {
      * @private
      */
     dec: function () {
-        var value = this.getAbsolute();
+        var value = this.getMemory();
         this.assemble_val(value);
         this.memory[this.o_index++] = this.self.MNEMONICS.dec;
     },
@@ -384,14 +403,21 @@ Ext.define('BDC.lib.Assembler', {
     },
 
     /**
-     * Get absolute value
+     * Get memory location
      * @private
      * @return {Number}
      */
-    getAbsolute: function () {
+    getMemory: function () {
         var value, tt = this.getToken();
         if (tt !== this.self.TT_NUMBER && tt !== this.self.TT_ID) {
-            this.syntax_error();
+            if (tt === this.self.TT_LBRACKET) {
+                if ((value = this.getIndirect()) === false) {
+                    this.syntax_error();
+                }
+                return value;
+            } else {
+                this.syntax_error();
+            }
         }
 
         if (tt === this.self.TT_NUMBER) {
@@ -406,9 +432,37 @@ Ext.define('BDC.lib.Assembler', {
     },
 
     /**
-     * Get memory location or symbol table value
+     * Get indirect memory reference
+     * @private
+     * @returns {*}
      */
-    getLocation: function () {
+    getIndirect: function () {
+        var tt = this.getToken();
+        var value, save;
+
+        if (tt !== this.self.TT_ID)
+            return false;
+
+        save = this.token;
+        if (this.getToken() !== this.self.TT_RBRACKET)
+            return false;
+
+        // must be w|x|y|z
+        if (save.match(/^[w-z]$/) === null)
+            return false;
+
+        if ((value = this.self.PSEUDO_REGS[save]) === undefined)
+            return false;
+
+        value = value - this.self.PSEUDO_REGS.v;
+
+        return value;
+    },
+
+    /**
+     * Get branch target
+     */
+    getTarget: function () {
         var value, tt = this.getToken();
         if (tt !== this.self.TT_NUMBER && tt !== this.self.TT_ID)
             this.syntax_error();
