@@ -16,11 +16,11 @@ Ext.define('BDC.lib.ButtonsPanel', {
         },
         {
             xtype: 'button',
-            tooltip: { text: 'Launch Assembler Editor' },
-            text: 'ASSEMBLER',
+            tooltip: { text: 'Reset the machine' },
+            text: 'RESET',
             focusCls: '',
-            id: 'assemblerButton',
-            iconCls: 'assemble-icon',
+            id: 'resetButton',
+            iconCls: 'reset-icon',
             iconAlign: 'top',
             width: '80%',
             flex: 0.6
@@ -36,21 +36,6 @@ Ext.define('BDC.lib.ButtonsPanel', {
             focusCls: '',
             id: 'stepButton',
             iconCls: 'step-icon',
-            iconAlign: 'top',
-            width: '80%',
-            flex: 0.6
-        },
-        {
-            border: false,
-            flex: 0.2
-        },
-        {
-            xtype: 'button',
-            tooltip: { text: 'Reset the machine' },
-            text: 'RESET',
-            focusCls: '',
-            id: 'resetButton',
-            iconCls: 'reset-icon',
             iconAlign: 'top',
             width: '80%',
             flex: 0.6
@@ -119,6 +104,21 @@ Ext.define('BDC.lib.ButtonsPanel', {
                     }
                 ]
             }
+        },
+        {
+            border: false,
+            flex: 0.2
+        },
+        {
+            xtype: 'button',
+            tooltip: { text: 'Launch Assembler Editor' },
+            text: 'ASSEMBLER',
+            focusCls: '',
+            id: 'assemblerButton',
+            iconCls: 'assemble-icon',
+            iconAlign: 'top',
+            width: '80%',
+            flex: 0.6
         },
         {
             border: false,
