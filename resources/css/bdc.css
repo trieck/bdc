@@ -1,45 +1,14 @@
 body {
-    background-color: #dfe9f6;
-    margin: 20px;
-    padding: 20px;
+    font-family: serif;
+    font-size: 80%;
 }
 
-.box {
-    border: 2px solid darkblue;
+i {
+    color: darkred;
 }
 
-.box .title {
-    background: darkblue;
-    color: white;
-    padding: 10px;
-    text-transform: uppercase;
-    text-align: left;
-}
-
-.box .content {
-    color: darkblue;
-    padding: 10px;
-}
-
-.box .content .code {
-    color: slateblue;
-}
-
-.box {
-    -moz-border-radius-topright: 5px;
-    -moz-border-radius-topleft: 5px;
-    -webkit-border-top-right-radius: 5px;
-    -webkit-border-top-left-radius: 5px;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-}
-
-h1 {
-    color: darkblue;
-}
-
-h3 {
-    color: darkblue;
+.code {
+    color: darkred;
 }
 
 .assemble-icon {

@@ -1,6 +1,7 @@
 Ext.define('BDC.lib.Frame', {
     extend: 'Ext.panel.Panel',
     alias: 'bdc-frame',
+    itemId: 'bdc-frame',
     title: 'Basic Decimal Computer',
     renderTo: 'bdc-app',
     iconCls: 'cpu-icon',
