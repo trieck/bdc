@@ -53,7 +53,7 @@ i {
     font-family: "Menlo", "Courier New", "Courier", monospace;
     font-weight: 900;
     font-size: 12px;
-    color: darkblue;
+    color: #4c3000;
     text-align: left;
 }
 
@@ -83,4 +83,24 @@ i {
 
 .x-tip-body span {
     width: auto !important;
+}
+
+.x-panel-header-text-container-default {
+    color: #4c3000 !important;
+}
+
+.x-panel-header-default {
+    border: 1px solid #4c3000;
+    background-image: url(../../jquery-ui-1.11.1.custom/images/ui-bg_gloss-wave_60_fece2f_500x100.png);
+}
+
+.x-panel-body-default {
+    border: 1px solid #4c3000;
+    border-color: #4c3000;
+}
+
+.x-toolbar-default {
+    border: 1px solid #4c3000;
+    border-color: #4c3000;
+    background-image: url(../../jquery-ui-1.11.1.custom/images/ui-bg_gloss-wave_60_fece2f_500x100.png);
 }
