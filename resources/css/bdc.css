@@ -158,3 +158,36 @@ i {
     background-image: -o-linear-gradient(top, #ffcc00, #FFDE73);
     background-image: linear-gradient(top, #ffcc00, #FFDE73);
 }
+
+.x-btn-default-toolbar-small-over {
+    border-color: #ffaa00;
+    background-image: none;
+    background-color: #FFDE73;
+    background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #FFDE73), color-stop(100%, #feeebd));
+    background-image: -webkit-linear-gradient(top, #FFDE73, #feeebd);
+    background-image: -moz-linear-gradient(top, #FFDE73, #feeebd);
+    background-image: -o-linear-gradient(top, #FFDE73, #feeebd);
+    background-image: linear-gradient(top, #FFDE73, #feeebd);
+}
+
+.x-btn-default-toolbar-small-focus {
+    border-color: #908877;
+    background-image: none;
+    background-color: #FFDE73;
+    background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #FFDE73), color-stop(100%, #feeebd));
+    background-image: -webkit-linear-gradient(top, #FFDE73, #feeebd);
+    background-image: -moz-linear-gradient(top, #FFDE73, #feeebd);
+    background-image: -o-linear-gradient(top, #FFDE73, #feeebd);
+    background-image: linear-gradient(top, #FFDE73, #feeebd);
+}
+
+.x-btn-default-toolbar-small-pressed {
+    border-color: #ffaa00;
+    background-image: none;
+    background-color: #ffcc00;
+    background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffcc00), color-stop(100%, #FFDE73));
+    background-image: -webkit-linear-gradient(top, #ffcc00, #FFDE73);
+    background-image: -moz-linear-gradient(top, #ffcc00, #FFDE73);
+    background-image: -o-linear-gradient(top, #ffcc00, #FFDE73);
+    background-image: linear-gradient(top, #ffcc00, #FFDE73);
+}
