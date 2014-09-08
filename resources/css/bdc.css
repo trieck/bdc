@@ -91,7 +91,13 @@ i {
 
 .x-panel-header-default {
     border: 1px solid #4c3000;
-    background-image: url(../../jquery-ui-1.11.1.custom/images/ui-bg_gloss-wave_60_fece2f_500x100.png);
+    background-image: none;
+    background-color: #ffcc00;
+    background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffcc00), color-stop(100%, #FFDE73));
+    background-image: -webkit-linear-gradient(top, #ffcc00, #FFDE73);
+    background-image: -moz-linear-gradient(top, #ffcc00, #FFDE73);
+    background-image: -o-linear-gradient(top, #ffcc00, #FFDE73);
+    background-image: linear-gradient(top, #ffcc00, #FFDE73);
 }
 
 .x-panel-body-default {
@@ -101,7 +107,13 @@ i {
 
 .x-toolbar-default {
     border: 1px solid #4c3000;
-    background-image: url(../../jquery-ui-1.11.1.custom/images/ui-bg_gloss-wave_60_fece2f_500x100.png);
+    background-image: none;
+    background-color: #ffcc00;
+    background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffcc00), color-stop(100%, #FFDE73));
+    background-image: -webkit-linear-gradient(top, #ffcc00, #FFDE73);
+    background-image: -moz-linear-gradient(top, #ffcc00, #FFDE73);
+    background-image: -o-linear-gradient(top, #ffcc00, #FFDE73);
+    background-image: linear-gradient(top, #ffcc00, #FFDE73);
 }
 
 .x-btn-default-small {
@@ -190,4 +202,9 @@ i {
     background-image: -moz-linear-gradient(top, #ffcc00, #FFDE73);
     background-image: -o-linear-gradient(top, #ffcc00, #FFDE73);
     background-image: linear-gradient(top, #ffcc00, #FFDE73);
+}
+
+.x-tip-default {
+    border-color: #ffaa00;
+    background-color: #FFDE73;
 }
