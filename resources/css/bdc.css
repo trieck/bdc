@@ -96,11 +96,65 @@ i {
 
 .x-panel-body-default {
     border: 1px solid #4c3000;
-    border-color: #4c3000;
+    background-color: rgb(254, 238, 189);
 }
 
 .x-toolbar-default {
     border: 1px solid #4c3000;
-    border-color: #4c3000;
     background-image: url(../../jquery-ui-1.11.1.custom/images/ui-bg_gloss-wave_60_fece2f_500x100.png);
+}
+
+.x-btn-default-small {
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    -ms-border-radius: 3px;
+    -o-border-radius: 3px;
+    border-radius: 3px;
+    padding: 2px 2px 2px 2px;
+    border-color: #ffcc00;
+    border-width: 1px;
+    border-style: solid;
+    background-image: none;
+    background-color: #FFDE73;
+    background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #FFDE73), color-stop(100%, #feeebd));
+    background-image: -webkit-linear-gradient(top, #FFDE73, #feeebd);
+    background-image: -moz-linear-gradient(top, #FFDE73, #feeebd);
+    background-image: -o-linear-gradient(top, #FFDE73, #feeebd);
+    background-image: linear-gradient(top, #FFDE73, #feeebd);
+}
+
+.x-btn-default-small-over {
+    border-color: #ffaa00;
+    background-image: none;
+    background-color: #FFDE73;
+    background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #FFDE73), color-stop(100%, #feeebd));
+    background-image: -webkit-linear-gradient(top, #FFDE73, #feeebd);
+    background-image: -moz-linear-gradient(top, #FFDE73, #feeebd);
+    background-image: -o-linear-gradient(top, #FFDE73, #feeebd);
+    background-image: linear-gradient(top, #FFDE73, #feeebd);
+}
+
+/* line 516, ../../../ext-theme-neutral/sass/src/button/Button.scss */
+.x-btn-default-small-focus {
+    border-color: #908877;
+    background-image: none;
+    background-color: #FFDE73;
+    background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #FFDE73), color-stop(100%, #feeebd));
+    background-image: -webkit-linear-gradient(top, #FFDE73, #feeebd);
+    background-image: -moz-linear-gradient(top, #FFDE73, #feeebd);
+    background-image: -o-linear-gradient(top, #FFDE73, #feeebd);
+    background-image: linear-gradient(top, #FFDE73, #feeebd);
+}
+
+/* line 541, ../../../ext-theme-neutral/sass/src/button/Button.scss */
+.x-btn-default-small-menu-active,
+.x-btn-default-small-pressed {
+    border-color: #ffaa00;
+    background-image: none;
+    background-color: #ffcc00;
+    background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffcc00), color-stop(100%, #FFDE73));
+    background-image: -webkit-linear-gradient(top, #ffcc00, #FFDE73);
+    background-image: -moz-linear-gradient(top, #ffcc00, #FFDE73);
+    background-image: -o-linear-gradient(top, #ffcc00, #FFDE73);
+    background-image: linear-gradient(top, #ffcc00, #FFDE73);
 }
