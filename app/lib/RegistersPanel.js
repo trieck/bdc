@@ -23,7 +23,13 @@ Ext.define('BDC.lib.RegistersPanel', {
             vtype: 'two-digits',
             enableKeyEvents: true,
             listeners: {
-                'keypress': function (field) {
+                'keypress': function (field, event) {
+                    var code = event.getCharCode();
+                    if (code < 48 || code > 57) {
+                        event.stopEvent();
+                        return;
+                    }
+
                     var value = field.getValue();
                     if (value.length === 2) {
                         field.setRawValue('');
@@ -46,7 +52,13 @@ Ext.define('BDC.lib.RegistersPanel', {
             vtype: 'two-digits',
             enableKeyEvents: true,
             listeners: {
-                'keypress': function (field) {
+                'keypress': function (field, event) {
+                    var code = event.getCharCode();
+                    if (code < 48 || code > 57) {
+                        event.stopEvent();
+                        return;
+                    }
+
                     var value = field.getValue();
                     if (value.length === 2) {
                         field.setRawValue('');
@@ -69,7 +81,13 @@ Ext.define('BDC.lib.RegistersPanel', {
             vtype: 'three-digits',
             enableKeyEvents: true,
             listeners: {
-                'keypress': function (field) {
+                'keypress': function (field, event) {
+                    var code = event.getCharCode();
+                    if (code < 48 || code > 57) {
+                        event.stopEvent();
+                        return;
+                    }
+
                     var value = field.getValue();
                     if (value.length === 3) {
                         field.setRawValue('');

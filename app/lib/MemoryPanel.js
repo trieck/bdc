@@ -12,6 +12,12 @@ Ext.define('BDC.lib.MemoryPanel', {
     padding: '10px',
 
     keyPress: function (field, event) {
+        var code = event.getCharCode();
+        if (code < 48 || code > 57) {
+            event.stopEvent();
+            return;
+        }
+
         field.setRawValue('');
     },
 
