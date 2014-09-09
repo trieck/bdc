@@ -3,7 +3,7 @@ Ext.define('BDC.lib.AssemblerEditor', {
     requires: 'BDC.lib.Assembler',
     itemId: 'bdc-assembler',
     title: 'BDC Assembler',
-    renderTo: 'bdc-app',
+    renderTo: 'bdc-assembler',
     iconCls: 'assemble-icon',
     closable: true,
     width: 600,

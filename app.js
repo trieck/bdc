@@ -14,7 +14,7 @@ $(function () {
             var frame;
             if (ui.newTab.index() === 1) {
                 frame = Ext.ComponentQuery.query('#bdc-frame')[0];
-                frame.doLayout();
+                if (frame) frame.doLayout();
             }
         }
     });

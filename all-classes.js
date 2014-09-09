@@ -143,10 +143,8 @@ Ext.define('BDC.lib.MemoryPanel', {
     },
     padding: '10px',
 
-    digitValidator: function () {
-        var value = this.getValue();
-        if (value.length >= 1)
-            this.setValue(value.slice(0, 1));
+    keyPress: function (field, event) {
+        field.setRawValue('');
     },
 
     initComponent: function () {
@@ -186,7 +184,7 @@ Ext.define('BDC.lib.MemoryPanel', {
                 vtype: 'digit',
                 enableKeyEvents: true,
                 listeners: {
-                    'keyup': this.digitValidator
+                    'keypress': this.keyPress
                 },
                 margin: '2px'
             });
@@ -381,10 +379,11 @@ Ext.define('BDC.lib.RegistersPanel', {
             vtype: 'two-digits',
             enableKeyEvents: true,
             listeners: {
-                'keyup': function () {
-                    var value = this.getValue();
-                    if (value.length > 2)
-                        this.setValue(value.slice(0, 2));
+                'keypress': function (field) {
+                    var value = field.getValue();
+                    if (value.length === 2) {
+                        field.setRawValue('');
+                    }
                 }
             },
             width: 75
@@ -403,10 +402,11 @@ Ext.define('BDC.lib.RegistersPanel', {
             vtype: 'two-digits',
             enableKeyEvents: true,
             listeners: {
-                'keyup': function () {
-                    var value = this.getValue();
-                    if (value.length > 2)
-                        this.setValue(value.slice(0, 2));
+                'keypress': function (field) {
+                    var value = field.getValue();
+                    if (value.length === 2) {
+                        field.setRawValue('');
+                    }
                 }
             },
             width: 75
@@ -425,10 +425,11 @@ Ext.define('BDC.lib.RegistersPanel', {
             vtype: 'three-digits',
             enableKeyEvents: true,
             listeners: {
-                'keyup': function () {
-                    var value = this.getValue();
-                    if (value.length > 3)
-                        this.setValue(value.slice(0, 3));
+                'keypress': function (field) {
+                    var value = field.getValue();
+                    if (value.length === 3) {
+                        field.setRawValue('');
+                    }
                 }
             },
             width: 75
@@ -1087,6 +1088,7 @@ Ext.define('BDC.lib.Assembler', {
     refs: [],       // forward reference list
     program: '',    // input program
     token: '',      // current input token
+    tt: undefined,  // current input token type
     i_index: 0,     // current input index
     o_index: 0,     // current index into memory
     line_no: 0,     // current line number
@@ -1102,6 +1104,7 @@ Ext.define('BDC.lib.Assembler', {
         this.i_index = this.o_index = 0;
         this.line_no = 1;
         this.token = this.program = '';
+        this.tt = this.self.TT_EMPTY;
     },
 
     constructor: function () {
@@ -1128,10 +1131,12 @@ Ext.define('BDC.lib.Assembler', {
      */
     parse: function () {
         this.i_index = 0;
-        var tt;
 
-        while ((tt = this.getToken()) !== this.self.TT_EMPTY) {
-            switch (tt) {
+        while (true) {
+            this.getToken();
+            switch (this.tt) {
+                case this.self.TT_EMPTY:    // empty
+                    return;
                 case this.self.TT_LABEL:    // label definition
                     this.label();
                     break;
@@ -1150,7 +1155,6 @@ Ext.define('BDC.lib.Assembler', {
      * @private
      */
     resolve: function () {
-
         Ext.each(this.refs, function (ref) {
             var value, message;
             if ((value = this.symbols[ref.name]) === undefined) {
@@ -1171,7 +1175,7 @@ Ext.define('BDC.lib.Assembler', {
      */
     getToken: function () {
         var c, length = this.program.length;
-        var tt = this.self.TT_EMPTY;
+        this.tt = this.self.TT_EMPTY;
 
         for (this.token = ''; this.i_index < length; ++this.i_index) {
             c = this.program[this.i_index];
@@ -1180,13 +1184,14 @@ Ext.define('BDC.lib.Assembler', {
                 case '\t':
                 case '\r':
                     if (this.token.length) {
-                        return tt;
+                        return;
                     }
                     break;
                 case ':':   // label definition
                     if (this.token.length) {
                         this.i_index++;
-                        return this.self.TT_LABEL;
+                        this.tt = this.self.TT_LABEL;
+                        return;
                     } else {
                         this.syntax_error();
                     }
@@ -1196,33 +1201,35 @@ Ext.define('BDC.lib.Assembler', {
                     break;
                 case '[':   // left bracket
                     if (this.token.length) {
-                        return tt;
+                        return;
                     }
                     this.token = c;
                     this.i_index++;
-                    return this.self.TT_LBRACKET;
+                    this.tt = this.self.TT_LBRACKET;
+                    return;
                 case ']':   // right bracket
                     if (this.token.length) {
-                        return tt;
+                        return;
                     }
                     this.token = c;
                     this.i_index++;
-                    return this.self.TT_RBRACKET;
+                    this.tt = this.self.TT_RBRACKET;
+                    return;
                 case '\n':  // new line
                     this.line_no++;
                     if (this.token.length) {
-                        return tt;
+                        return;
                     }
                     break;
                 default:
                     if (BDC.lib.Character.isdigit(c)) {
-                        if (tt === this.self.TT_EMPTY) {
-                            tt = this.self.TT_NUMBER;
+                        if (this.tt === this.self.TT_EMPTY) {
+                            this.tt = this.self.TT_NUMBER;
                         }
                         this.token += c;
                         continue;
                     } else if (BDC.lib.Character.isalpha(c)) {
-                        tt = this.self.TT_ID;
+                        this.tt = this.self.TT_ID;
                         this.token += c;
                         continue;
                     } else {
@@ -1231,8 +1238,6 @@ Ext.define('BDC.lib.Assembler', {
                     break;
             }
         }
-
-        return tt;
     },
 
     /**
@@ -1396,21 +1401,21 @@ Ext.define('BDC.lib.Assembler', {
     },
 
     /**
-     * Increment a value in memory
+     * Increment a value in memory or accumulator
      * @private
      */
     inc: function () {
-        var value = this.getMemory();
+        var value = this.getMemAcc();
         this.assemble_val(value);
         this.memory[this.o_index++] = this.self.MNEMONICS.inc;
     },
 
     /**
-     * Decrement a value in memory
+     * Decrement a value in memory or accumulator
      * @private
      */
     dec: function () {
-        var value = this.getMemory();
+        var value = this.getMemAcc();
         this.assemble_val(value);
         this.memory[this.o_index++] = this.self.MNEMONICS.dec;
     },
@@ -1421,8 +1426,8 @@ Ext.define('BDC.lib.Assembler', {
      * @returns {Number}
      */
     getImmediate: function () {
-        var tt = this.getToken();
-        if (tt !== this.self.TT_NUMBER)
+        this.getToken();
+        if (this.tt !== this.self.TT_NUMBER)
             this.syntax_error();
 
         return this.parseValue();
@@ -1450,19 +1455,30 @@ Ext.define('BDC.lib.Assembler', {
      * @return {Number}
      */
     getMemory: function () {
-        var value, tt = this.getToken();
-        if (tt !== this.self.TT_NUMBER && tt !== this.self.TT_ID) {
-            if (tt === this.self.TT_LBRACKET) {
-                if ((value = this.getIndirect()) === false) {
-                    this.syntax_error();
-                }
-                return value;
-            } else {
+        this.getToken();
+        return this.getMemValue();
+    },
+
+    /**
+     * Get memory value from current input token
+     * @private
+     * @returns {Number}
+     */
+    getMemValue: function () {
+        var value;
+
+        if (this.tt === this.self.TT_LBRACKET) {    // indirect
+            if ((value = this.getIndirect()) === false) {
                 this.syntax_error();
             }
+            return value;
         }
 
-        if (tt === this.self.TT_NUMBER) {
+        if (this.tt !== this.self.TT_NUMBER && this.tt !== this.self.TT_ID) {
+            this.syntax_error();
+        }
+
+        if (this.tt === this.self.TT_NUMBER) {
             return this.parseValue();
         }
 
@@ -1474,19 +1490,35 @@ Ext.define('BDC.lib.Assembler', {
     },
 
     /**
+     * Get memory location or accumulator addressing
+     * @private
+     * @return {Number}
+     */
+    getMemAcc: function () {
+        this.getToken();
+
+        if (this.tt === this.self.TT_ID && this.token === 'a') {    // accumulator addressing
+            return 0;   // special accumulator addressing indicator
+        }
+
+        return this.getMemValue();
+    },
+
+    /**
      * Get indirect memory reference
      * @private
      * @returns {*}
      */
     getIndirect: function () {
-        var tt = this.getToken();
         var value, save;
 
-        if (tt !== this.self.TT_ID)
+        this.getToken();
+        if (this.tt !== this.self.TT_ID)
             return false;
 
         save = this.token;
-        if (this.getToken() !== this.self.TT_RBRACKET)
+        this.getToken();
+        if (this.tt !== this.self.TT_RBRACKET)
             return false;
 
         // must be w|x|y|z
@@ -1505,11 +1537,12 @@ Ext.define('BDC.lib.Assembler', {
      * Get branch target
      */
     getTarget: function () {
-        var value, tt = this.getToken();
-        if (tt !== this.self.TT_NUMBER && tt !== this.self.TT_ID)
+        var value;
+        this.getToken();
+        if (this.tt !== this.self.TT_NUMBER && this.tt !== this.self.TT_ID)
             this.syntax_error();
 
-        if (tt === this.self.TT_NUMBER)
+        if (this.tt === this.self.TT_NUMBER)
             return this.parseValue();
 
         if ((value = this.symbols[this.token]) !== undefined) {
@@ -1583,7 +1616,7 @@ Ext.define('BDC.lib.AssemblerEditor', {
     requires: 'BDC.lib.Assembler',
     itemId: 'bdc-assembler',
     title: 'BDC Assembler',
-    renderTo: 'bdc-app',
+    renderTo: 'bdc-assembler',
     iconCls: 'assemble-icon',
     closable: true,
     width: 600,
@@ -1659,6 +1692,7 @@ Ext.define('BDC.lib.AssemblerEditor', {
 Ext.define('BDC.lib.Frame', {
     extend: 'Ext.panel.Panel',
     alias: 'bdc-frame',
+    itemId: 'bdc-frame',
     title: 'Basic Decimal Computer',
     renderTo: 'bdc-app',
     iconCls: 'cpu-icon',
