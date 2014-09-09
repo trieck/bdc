@@ -23,10 +23,11 @@ Ext.define('BDC.lib.RegistersPanel', {
             vtype: 'two-digits',
             enableKeyEvents: true,
             listeners: {
-                'keyup': function () {
-                    var value = this.getValue();
-                    if (value.length > 2)
-                        this.setValue(value.slice(0, 2));
+                'keypress': function (field) {
+                    var value = field.getValue();
+                    if (value.length === 2) {
+                        field.setRawValue('');
+                    }
                 }
             },
             width: 75
@@ -45,10 +46,11 @@ Ext.define('BDC.lib.RegistersPanel', {
             vtype: 'two-digits',
             enableKeyEvents: true,
             listeners: {
-                'keyup': function () {
-                    var value = this.getValue();
-                    if (value.length > 2)
-                        this.setValue(value.slice(0, 2));
+                'keypress': function (field) {
+                    var value = field.getValue();
+                    if (value.length === 2) {
+                        field.setRawValue('');
+                    }
                 }
             },
             width: 75
@@ -67,10 +69,11 @@ Ext.define('BDC.lib.RegistersPanel', {
             vtype: 'three-digits',
             enableKeyEvents: true,
             listeners: {
-                'keyup': function () {
-                    var value = this.getValue();
-                    if (value.length > 3)
-                        this.setValue(value.slice(0, 3));
+                'keypress': function (field) {
+                    var value = field.getValue();
+                    if (value.length === 3) {
+                        field.setRawValue('');
+                    }
                 }
             },
             width: 75

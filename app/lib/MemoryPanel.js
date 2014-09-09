@@ -11,10 +11,8 @@ Ext.define('BDC.lib.MemoryPanel', {
     },
     padding: '10px',
 
-    digitValidator: function () {
-        var value = this.getValue();
-        if (value.length >= 1)
-            this.setValue(value.slice(0, 1));
+    keyPress: function (field, event) {
+        field.setRawValue('');
     },
 
     initComponent: function () {
@@ -54,7 +52,7 @@ Ext.define('BDC.lib.MemoryPanel', {
                 vtype: 'digit',
                 enableKeyEvents: true,
                 listeners: {
-                    'keyup': this.digitValidator
+                    'keypress': this.keyPress
                 },
                 margin: '2px'
             });
