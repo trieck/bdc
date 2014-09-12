@@ -175,6 +175,7 @@ Ext.define('BDC.lib.Assembler', {
                 case '\n':  // new line
                     this.line_no++;
                     if (this.token.length) {
+                        this.i_index++;
                         return;
                     }
                     break;
