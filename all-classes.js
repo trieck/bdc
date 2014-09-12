@@ -1240,10 +1240,10 @@ Ext.define('BDC.lib.Assembler', {
                     this.tt = this.self.TT_RBRACKET;
                     return;
                 case '\n':  // new line
-                    this.line_no++;
                     if (this.token.length) {
                         return;
                     }
+                    this.line_no++;
                     break;
                 default:
                     if (BDC.lib.Character.isdigit(c)) {
