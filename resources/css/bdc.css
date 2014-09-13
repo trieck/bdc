@@ -19,6 +19,10 @@ i {
     background-image: url(../images/cpu.png) !important;
 }
 
+.disassemble-icon {
+    background-image: url(../images/disassemble.png) !important;
+}
+
 .halt-icon {
     background-image: url(../images/halt.png) !important;
     background-repeat: no-repeat;

@@ -9,7 +9,7 @@ Ext.define('BDC.lib.MemoryPanel', {
         type: 'table',
         columns: 11
     },
-    padding: '10px',
+    padding: '10px 5px 10px 0px',
 
     keyPress: function (field, event) {
         var code = event.getCharCode();

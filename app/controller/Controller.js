@@ -1,10 +1,11 @@
 Ext.define('BDC.controller.Controller', {
     extend: 'Ext.app.Controller',
-    uses: ['BDC.lib.Programs', 'BDC.lib.AssemblerEditor'],
+    uses: ['BDC.lib.Programs', 'BDC.lib.AssemblerEditor', 'BDC.lib.Disassembler'],
     views: [ 'BDC.view.View' ],
     refs: [
         { selector: 'bdc-view', ref: 'BDCView' },
-        { selector: 'panel[itemId=bdc-assembler]', ref: 'Assembler' }
+        { selector: 'panel[itemId=bdc-assembler]', ref: 'Assembler' },
+        { selector: 'panel[itemId=bdc-disassembler]', ref: 'Disassembler' }
     ],
 
     init: function () {
@@ -14,6 +15,9 @@ Ext.define('BDC.controller.Controller', {
             },
             '#assemblerButton': {
                 click: this.onAssembler
+            },
+            '#disassemblerButton': {
+                click: this.onDisassembler
             },
             '#assembleButton': {
                 click: this.onAssemble
@@ -51,6 +55,10 @@ Ext.define('BDC.controller.Controller', {
 
     onAssembler: function () {
         BDC.lib.AssemblerEditor.show();
+    },
+
+    onDisassembler: function () {
+        BDC.lib.Disassembler.show();
     },
 
     onAssemble: function () {
