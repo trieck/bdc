@@ -35,17 +35,17 @@
         rather
         than binary, for easier comprehension. Nevertheless, it exhibits many features common to actual computers.
         <br/><br/>
-        Following the <font color="#D07070"><i>Von Neumann model,</i></font> used in nearly all modern computers,
+        Following the <font color="darkred"><i>Von Neumann model,</i></font> used in nearly all modern computers,
         <font
-                color="#D07070"><i>main memory</i></font> holds both numeric data and encoded <font color="#D07070"><i>machine
+                color="darkred"><i>main memory</i></font> holds both numeric data and encoded <font color="darkred"><i>machine
             instructions</i></font> telling the computer how to manipulate the data. Each of one hundred <font
-                color="#D07070"><i>memory cells</i></font> (in main memory) contains a <i>single</i> decimal digit,
+                color="darkred"><i>memory cells</i></font> (in main memory) contains a <i>single</i> decimal digit,
         which
         can be
-        changed. Also, each cell is uniquely identified via its (unchangable) 2-digit <font color="#D07070"><i>memory
+        changed. Also, each cell is uniquely identified via its (unchangable) 2-digit <font color="darkred"><i>memory
             address.</i></font> These addresses range from <tt>00</tt> to <tt>99</tt>. The BDC uses the standard
         <font
-                color="#D07070"><i>little-endian</i></font> convention. This means that whenever a multi-digit value
+                color="darkred"><i>little-endian</i></font> convention. This means that whenever a multi-digit value
         is
         stored
         in main memory, its digits are stored in consecutive memory cells, <i>beginning with the least significant
@@ -55,19 +55,19 @@
         whose
         address is 96 would hold the digit 3, and the cell whose address is 97 would hold the digit 1. <br/><br/>There
         are only
-        three <font color="#D07070"><i>CPU registers,</i></font> which hold multi-digit values, as follows:
+        three <font color="darkred"><i>CPU registers,</i></font> which hold multi-digit values, as follows:
     <ul>
-        <li> The <font color="#D07070"><i>accumulator</i></font> (A) contains two digits. It is used to hold and
+        <li> The <font color="darkred"><i>accumulator</i></font> (A) contains two digits. It is used to hold and
             manipulate
             data during a computation.
         </li>
-        <li> The <font color="#D07070"><i>program counter</i></font> (PC) contains two digits. It is used to
+        <li> The <font color="darkred"><i>program counter</i></font> (PC) contains two digits. It is used to
             remember
             the
             main memory <i>address</i> where the <i>next</i> machine instruction (to be fetched and executed)
             begins.
         </li>
-        <li> The <font color="#D07070"><i>instruction register</i></font> (IR) contains three digits. It holds a
+        <li> The <font color="darkred"><i>instruction register</i></font> (IR) contains three digits. It holds a
             copy of
             the
             machine instruction currently being examined and executed.
@@ -77,7 +77,7 @@
     <div class="code">
         <pre>Inst.  Meaning  <br>-----  -------  <br> 000   Halt. (Terminate program.)  <br> 0??   Branch by an amount ??, by adding the number ?? to PC (?? != 0).   <br> 1??   Same as 0?? but only branch if most recent add/subtract caused overflow.  <br> 2??   Same as 0?? but only branch if most recent add/subtract did not cause overflow.  <br> 3??   Put the actual number ?? into A.  <br> 4??   Copy 2-digit value from main memory into A, starting at memory address ??.   <br> 5??   Add 2-digit value starting at memory address ??, to A.   <br> 6??   Subtract 2-digit value starting at memory address ??, from A.  <br> 7??   Copy 2-digit value from A into main memory, starting at memory address ??.   <br> 8??   Increment 2-digit value starting at memory address ??.   <br> 9??   Decrement 2-digit value starting at memory address ??.  <br></pre>
     </div>
-    Addition and subtraction are always performed <font color="#D07070"><i>modulo-one-hundred</i></font>. This means
+    Addition and subtraction are always performed <font color="darkred"><i>modulo-one-hundred</i></font>. This means
     that
     some multiple of one hundred might need to be added to or subtracted from the answer, so as to force it to be
     between 0
@@ -95,7 +95,7 @@
     this
     sort of adjustment, either because adding two numbers would ordinarily be bigger that 99, or because subtracting
     two
-    numbers would ordinarily be negative, we say that an <font color="#D07070"><i>overflow</i></font> has occurred.
+    numbers would ordinarily be negative, we say that an <font color="darkred"><i>overflow</i></font> has occurred.
     <br/><br/> Concerning memory addresses, the instruction descriptions in the above table are not exactly correct.
     The
     phrase 'memory address <tt>??</tt>' occurs in the descriptions of instructions <tt>4??</tt> through <tt>9??</tt>.
@@ -106,13 +106,13 @@
     <tt>800</tt> increments the accumulator. Moreover, when the first digit in <tt>??</tt> is zero, but the second
     digit
     is
-    nonzero, <font color="#D07070"><i>indirect addressing</i></font> is used instead. This is explained later, but
+    nonzero, <font color="darkred"><i>indirect addressing</i></font> is used instead. This is explained later, but
     it
     might
     be better to ignore indirect addressing at least until after you gain a mastery of the more basic aspects of the
     BDC.
     <br/><br/>Consecutive machine instructions are stored in main memory, to form a <font
-        color="#D07070"><i>program.</i></font> In this way, the BDC can be directed to perform a task, in a
+        color="darkred"><i>program.</i></font> In this way, the BDC can be directed to perform a task, in a
     step-by-step
     manner. Each instruction occupies three consecutive cells. The machine instructions are ordinarily executed in
     the
@@ -130,7 +130,7 @@
     instruction beginning with <tt>0</tt> (other than <tt>000</tt>) can add any number to PC (modulo 100). This can
     be
     used
-    to <font color="#D07070"><i>branch</i></font> (jump) forward or backward, because of addition modulo one
+    to <font color="darkred"><i>branch</i></font> (jump) forward or backward, because of addition modulo one
     hundred.
     For
     instance, <tt>088</tt> means to branch forward by 88 cells. But, because of modulo-100 arithmetic, this is the
@@ -141,7 +141,7 @@
     instruction. Admittedly, this takes some getting used to. Instructions of the form <tt>1??</tt> are similarly
     used
     to
-    branch, but here the branching is <font color="#D07070"><i>conditional,</i></font> and occurs if and only if the
+    branch, but here the branching is <font color="darkred"><i>conditional,</i></font> and occurs if and only if the
     most
     recent adding or subtracting in a <tt>5??</tt>, <tt>6??</tt>, <tt>8??</tt> or <tt>9??</tt> instruction resulted
     in
