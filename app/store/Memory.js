@@ -32,7 +32,7 @@ Ext.define('BDC.store.Memory', {
         cell.set('value', value % 10);
     },
 
-    setCellRawValue: function(location, value) {
+    setCellRawValue: function (location, value) {
         this.suspendEvent('update');
         this.setCellValue(location, value);
         this.resumeEvent('update');
@@ -42,5 +42,12 @@ Ext.define('BDC.store.Memory', {
         this.each(function (record) {
             record.set('value', 0);
         });
+    },
+
+    loadProgram: function (program) {
+        var i;
+        for (i = 0; i < 100; ++i) {
+            this.setCellValue(i, program[i]);
+        }
     }
 });

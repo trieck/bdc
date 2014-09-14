@@ -90,7 +90,7 @@ Ext.define('BDC.controller.Controller', {
 
     onAssemble: function () {
         var memory, message, editor = this.getAssembler();
-        var machine = this.getMachineStore();
+        var store = this.getMemoryStore();
 
         try {
             memory = editor.assemble();
@@ -101,8 +101,7 @@ Ext.define('BDC.controller.Controller', {
         }
 
         this.onReset();
-
-        machine.loadAssembledProgram(memory);
+        store.loadProgram(memory);
     },
 
     onReset: function () {

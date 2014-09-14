@@ -302,15 +302,18 @@ Ext.define('BDC.store.Machine', {
      * @param program
      */
     loadProgram: function (program) {
+        var i, n = 0;
 
-    },
+        var memory = Ext.getStore('Memory');
 
-    /**
-     * Load assembled program
-     * @public
-     * @param program
-     */
-    loadAssembledProgram: function (program) {
+        this.startBatch();
+        this.setACC(program[n++]);
+        this.setPC(program[n++]);
+        this.setIR(program[n++]);
+        this.endBatch();
 
+        for (i = 0; i < 100; ++i) {
+            memory.setCellValue(i, program[n++]);
+        }
     }
 });
