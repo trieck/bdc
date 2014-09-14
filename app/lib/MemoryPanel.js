@@ -12,11 +12,13 @@ Ext.define('BDC.lib.MemoryPanel', {
     padding: '10px 5px 10px 0px',
 
     keyPress: function (field, event) {
-        var code = event.getCharCode();
+        var code = event.getCharCode(), store;
         if (code < 48 || code > 57) {
             event.stopEvent();
             return;
         }
+        store = Ext.getStore('Memory');
+        store.setCellRawValue(this.cellId, code - 48);
 
         field.setRawValue('');
     },
@@ -55,6 +57,7 @@ Ext.define('BDC.lib.MemoryPanel', {
                 emptyText: '0',
                 width: 25,
                 itemId: 'memory-cell-' + i,
+                cellId: i,
                 vtype: 'digit',
                 enableKeyEvents: true,
                 listeners: {
