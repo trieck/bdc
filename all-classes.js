@@ -8,10 +8,10 @@ Ext.define('BDC.lib.ButtonsPanel', {
         type: 'vbox',
         align: 'center'
     },
-    columnWidth: 0.2,
+    width: 130,
     height: 350,
     title: 'Options',
-    padding: '10px',
+    padding: '10 10 10 10',
     items: [
         {
             border: false,
@@ -125,6 +125,21 @@ Ext.define('BDC.lib.ButtonsPanel', {
         },
         {
             border: false,
+            flex: 0.10
+        },
+        {
+            xtype: 'button',
+            tooltip: { text: 'Launch Disassembler' },
+            text: 'DISASSEMBLER',
+            focusCls: '',
+            id: 'disassemblerButton',
+            iconCls: 'disassemble-icon',
+            iconAlign: 'top',
+            width: '80%',
+            flex: 0.6
+        },
+        {
+            border: false,
             flex: 0.2
         }
     ]
@@ -135,20 +150,23 @@ Ext.define('BDC.lib.MemoryPanel', {
     alias: 'widget.memory-panel',
     title: 'Main Memory',
     uses: [ 'BDC.lib.Colors', 'BDC.lib.DigitValidator' ],
-    columnWidth: 0.6,
+    width: 350,
     height: 350,
     layout: {
         type: 'table',
         columns: 11
     },
-    padding: '10px',
+    padding: '10 0 10 5',
 
     keyPress: function (field, event) {
-        var code = event.getCharCode();
+        var code = event.getCharCode(), store;
         if (code < 48 || code > 57) {
             event.stopEvent();
             return;
         }
+
+        store = Ext.getStore('Memory');
+        store.setCellValue(this.cellId, code - 48);
 
         field.setRawValue('');
     },
@@ -187,6 +205,7 @@ Ext.define('BDC.lib.MemoryPanel', {
                 emptyText: '0',
                 width: 25,
                 itemId: 'memory-cell-' + i,
+                cellId: i,
                 vtype: 'digit',
                 enableKeyEvents: true,
                 listeners: {
@@ -253,13 +272,6 @@ Ext.define('BDC.lib.MemoryPanel', {
     getCellValue: function (i, j) {
         var cell = this.getCell(i, j);
         return cell.getValue() % 10;
-    },
-
-    getNCellValue: function (n) {
-        var i, j;
-        i = Math.floor(n / 10) % 10;
-        j = n % 10;
-        return this.getCellValue(i, j);
     },
 
     setCellValue: function (i, j, value) {
@@ -367,9 +379,6 @@ Ext.define('BDC.lib.RegistersPanel', {
     title: 'CPU Registers',
     layout: 'vbox',
     bodyPadding: 10,
-    ac0: 0, ac1: 0,
-    pc0: 0, pc1: 0,
-    ir0: 0, ir1: 0, ir2: 0,
     items: [
         {
             xtype: 'textfield',
@@ -385,6 +394,16 @@ Ext.define('BDC.lib.RegistersPanel', {
             vtype: 'two-digits',
             enableKeyEvents: true,
             listeners: {
+                'keyup': function (field, event) {
+                    var code = event.getCharCode(), store;
+                    if (code < 48 || code > 57) {
+                        event.stopEvent();
+                        return;
+                    }
+                    store = Ext.getStore('Machine');
+                    store.setACCRaw(field.getValue());
+                },
+
                 'keypress': function (field, event) {
                     var code = event.getCharCode();
                     if (code < 48 || code > 57) {
@@ -414,6 +433,16 @@ Ext.define('BDC.lib.RegistersPanel', {
             vtype: 'two-digits',
             enableKeyEvents: true,
             listeners: {
+                'keyup': function (field, event) {
+                    var code = event.getCharCode(), store;
+                    if (code < 48 || code > 57) {
+                        event.stopEvent();
+                        return;
+                    }
+                    store = Ext.getStore('Machine');
+                    store.setPCRaw(field.getValue());
+                },
+
                 'keypress': function (field, event) {
                     var code = event.getCharCode();
                     if (code < 48 || code > 57) {
@@ -443,6 +472,16 @@ Ext.define('BDC.lib.RegistersPanel', {
             vtype: 'three-digits',
             enableKeyEvents: true,
             listeners: {
+                'keyup': function (field, event) {
+                    var code = event.getCharCode(), store;
+                    if (code < 48 || code > 57) {
+                        event.stopEvent();
+                        return;
+                    }
+                    store = Ext.getStore('Machine');
+                    store.setIRRaw(field.getValue());
+                },
+
                 'keypress': function (field, event) {
                     var code = event.getCharCode();
                     if (code < 48 || code > 57) {
@@ -471,107 +510,28 @@ Ext.define('BDC.lib.RegistersPanel', {
         component.reset();
     },
 
-    setAll: function () {
-        this.setACC();
-        this.setPC();
-        this.setIR();
-    },
-
-    setACC: function () {
-        var component = this.getComponent('ACC');
-        var n = component.getValue();
-        if (0 <= n && n < 100) {
-            this.ac1 = Math.floor(n / 10);
-            this.ac0 = n % 10;
-        }
-    },
-
-    setACCXY: function (x, y) {
-        var component = this.getComponent('ACC');
-        this.ac1 = x % 10;
-        this.ac0 = y % 10;
-        component.setValue('' + this.ac1 + '' + this.ac0);
-    },
-
-    setACCN: function (n) {
-        var x, y;
+    setACC: function (n) {
+        var x, y , component = this.getComponent('ACC');
         x = Math.floor(n / 10) % 10;
         y = n % 10;
-        this.setACCXY(x, y);
+        component.setValue(x + '' + y);
     },
 
-    setPC: function () {
-        var component = this.getComponent('PC');
-        var n = component.getValue();
-        if (0 <= n && n < 100) {
-            this.pc1 = Math.floor(n / 10);
-            this.pc0 = n % 10;
-        }
-    },
 
-    setPCXY: function (x, y) {
-        var component = this.getComponent('PC');
-        this.pc1 = x % 10;
-        this.pc0 = y % 10;
-        component.setValue('' + this.pc1 + '' + this.pc0);
-    },
-
-    setPCN: function (n) {
-        var x, y;
+    setPC: function (n) {
+        var x, y, component = this.getComponent('PC');
         x = Math.floor(n / 10) % 10;
         y = n % 10;
-        this.setPCXY(x, y);
+        component.setValue(x + '' + y);
     },
 
-    setIR: function () {
-        var component = this.getComponent('IR');
-        var n = component.getValue();
-        if (0 <= n && n < 1000) {
-            this.ir2 = Math.floor(n / 100);
-            n = n % 100;
-            this.ir1 = Math.floor(n / 10);
-            this.ir0 = n % 10;
-        }
-    },
-
-    incPC: function () {
-        var pc = this.getComponent('PC');
-
-        this.pc0++;
-        if (this.pc0 === 10) {
-            this.pc0 = 0;
-            this.pc1 = (this.pc1 + 1) % 10;
-        }
-
-        pc.setValue('' + this.pc1 + '' + this.pc0);
-    },
-
-    setIRXYZ: function (x, y, z) {
-        var ir = this.getComponent('IR');
-        this.ir2 = x % 10;
-        this.ir1 = y % 10;
-        this.ir0 = z % 10;
-        ir.setValue('' + this.ir2 + '' + this.ir1 + '' + this.ir0);
-    },
-
-    setIRN: function (n) {
-        var x, y, z;
+    setIR: function (n) {
+        var x, y, z, component = this.getComponent('IR');
         x = Math.floor(n / 100) % 10;
         n = n % 100;
         y = Math.floor(n / 10);
         z = n % 10;
-        this.setIRXYZ(x, y, z);
-    },
-
-    setStrings: function () {
-        var component = this.getComponent('ACC');
-        component.setValue('' + this.ac1 + '' + this.ac0);
-
-        component = this.getComponent('PC');
-        component.setValue('' + this.pc1 + '' + this.pc0);
-
-        component = this.getComponent('IR');
-        component.setValue('' + this.ir2 + '' + this.ir1 + '' + this.ir0);
+        component.setValue(x + '' + y + '' + z);
     }
 });
 
@@ -583,12 +543,12 @@ Ext.define('BDC.lib.StatusPanel', {
         'BDC.lib.FlagsPanel',
         'BDC.lib.HaltPanel'
     ],
-    columnWidth: 0.2,
+    width: 130,
     layout: {
         type: 'vbox',
         align: 'center'
     },
-    padding: '10px',
+    padding: '10 0 0 0',
     border: false,
     items: [
         {
@@ -611,10 +571,9 @@ Ext.define('BDC.view.View', {
     alias: 'widget.bdc-view',
     requires: [ 'BDC.lib.ButtonsPanel', 'BDC.lib.MemoryPanel', 'BDC.lib.StatusPanel' ],
     uses: [ 'BDC.lib.Colors'],
-    width: 600,
+    width: 610,
     height: 350,
     border: false,
-    of: false,  // overflow
     layout: {
         type: 'column'
     },
@@ -650,14 +609,19 @@ Ext.define('BDC.view.View', {
 
         panel = this.registersPanel();
         panel.clear();
-
         panel = this.haltPanel();
         panel.clearHalt();
 
-        this.of = false;
-
         panel = this.flagsPanel();
-        panel.setOverflow(this.of);
+        panel.setOverflow(false);
+    },
+
+    setStep: function () {
+        var panel = this.getComponent('memoryPanel');
+        panel.resetGray();
+
+        panel = this.haltPanel();
+        panel.clearHalt();
     },
 
     highlightInstruction: function (pc, color) {
@@ -690,215 +654,60 @@ Ext.define('BDC.view.View', {
         memoryPanel.highlight(ad1, ad0, color);
     },
 
-    step: function () {
-        var memoryPanel, registersPanel, haltPanel, flagsPanel;
-        var acc, ac0, ac1, pc, pc0, pc1, ir0, ir1, ir2;
-        var xy, xy_, cell0_, cell0, cell1_, cell1;
-        var value_, value;
-
-        memoryPanel = this.getComponent('memoryPanel');
-        memoryPanel.resetGray();
-
-        registersPanel = this.registersPanel();
-        registersPanel.setAll();
-
-        haltPanel = this.haltPanel();
-        haltPanel.clearHalt();
-
-        flagsPanel = this.flagsPanel();
-
-        ac0 = registersPanel.ac0;
-        ac1 = registersPanel.ac1;
-        acc = ac0 + 10 * ac1;
-
-        pc0 = registersPanel.pc0;
-        pc1 = registersPanel.pc1;
-        ir0 = memoryPanel.getCellValue(pc1, pc0);
-        registersPanel.incPC();
-
-        pc0 = registersPanel.pc0;
-        pc1 = registersPanel.pc1;
-        ir1 = memoryPanel.getCellValue(pc1, pc0);
-        registersPanel.incPC();
-
-        pc0 = registersPanel.pc0;
-        pc1 = registersPanel.pc1;
-        ir2 = memoryPanel.getCellValue(pc1, pc0);
-        registersPanel.incPC();
-
-        pc0 = registersPanel.pc0;
-        pc1 = registersPanel.pc1;
-        registersPanel.setIRXYZ(ir2, ir1, ir0);
-        registersPanel.setStrings();
-
-        pc = pc0 + 10 * pc1;
-        xy_ = xy = ir0 + 10 * ir1;
-        cell0_ = cell0 = memoryPanel.getNCellValue(xy);
-        cell1_ = cell1 = memoryPanel.getNCellValue((xy + 1) % 100);
-        value_ = value = cell0 + 10 * cell1;
-
-        if (ir2 >= 4) {
-            if (xy === 0) {          // accumulator addressing
-                cell0_ = ac0;
-                cell1_ = ac1;
-                value_ = acc;
-            } else if (ir1 === 0) {    // indirect addressing
-                xy_ = ir0 + 90;
-                cell0_ = memoryPanel.getNCellValue(xy_);
-                cell1_ = memoryPanel.getNCellValue((xy_ + 1) % 100);
-                xy_ = cell0_ + 10 * cell1_;
-                cell0_ = memoryPanel.getNCellValue(xy_);
-                cell1_ = memoryPanel.getNCellValue((xy_ + 1) % 100);
-                value_ = cell0_ + 10 * cell1_;
-            }
-        }
-
-        switch (ir2) {
-            case 0:      // branch or halt
-                if (ir0 !== 0 || ir1 !== 0)
-                    registersPanel.setPCN(pc + xy);
-                else {
-                    registersPanel.setPCN(pc + 97);
-                    haltPanel.setHalt();
-                }
-                break;
-            case 1:      // branch on overflow
-                if (this.of) if (ir0 !== 0 || ir1 !== 0)
-                    registersPanel.setPCN(pc + xy);
-                else {
-                    registersPanel.setPCN(pc + 97);
-                    haltPanel.setHalt();
-                }
-                break;
-            case 2:      // branch on not overflow
-                if (!this.of) if (ir0 !== 0 || ir1 !== 0)
-                    registersPanel.setPCN(pc + xy);
-                else {
-                    registersPanel.setPCN(pc + 97);
-                    haltPanel.setHalt();
-                }
-                break;
-            case 3:      // load immediate accumulator
-                registersPanel.setACCN(xy);
-                break;
-            case 4:      // fetch to accumulator
-                registersPanel.setACCN(value_);
-                break;
-            case 5:      // add to accumulator
-                this.of = acc + value_ > 100;
-                registersPanel.setACCN((acc + value_) % 100);
-                flagsPanel.setOverflow(this.of);
-                break;
-            case 6:      // subtract from accumulator
-                this.of = acc < value_;
-                registersPanel.setACCN((100 + acc - value_) % 100);
-                flagsPanel.setOverflow(this.of);
-                break;
-            case 7:      // store accumulator
-                if (xy !== 0) {
-                    memoryPanel.setNCellValue(xy_, ac0);
-                    memoryPanel.setNCellValue((xy_ + 1) % 100, ac1);
-                }
-                break;
-            case 8:      // increment memory value
-                this.of = value_ === 99;
-                value_ = (value_ + 1) % 100;
-                if (xy !== 0) {
-                    cell1_ = Math.floor(value_ / 10);
-                    cell0_ = value_ % 10;
-                    memoryPanel.setNCellValue(xy_, cell0_);
-                    memoryPanel.setNCellValue((xy_ + 1) % 100, cell1_);
-                } else {
-                    registersPanel.setACCN(value_);
-                }
-                flagsPanel.setOverflow(this.of);
-                break;
-            case 9:      // decrement memory value
-                this.of = value_ === 0;
-                value_ = (value_ + 99) % 100;
-                if (xy !== 0) {
-                    cell1_ = Math.floor(value_ / 10);
-                    cell0_ = value_ % 10;
-                    memoryPanel.setNCellValue(xy_, cell0_);
-                    memoryPanel.setNCellValue((xy_ + 1) % 100, cell1_);
-                } else {
-                    registersPanel.setACCN(value_);
-                }
-                flagsPanel.setOverflow(this.of);
-                break;
-        }
-
-        if (ir2 >= 4) {
-            if (ir1 !== 0) {
-                this.highlightData(xy, BDC.lib.Colors.BLUE);
-            } else if (ir0 !== 0) {
-                this.highlightData(90 + xy, BDC.lib.Colors.GREEN);
-                this.highlightData(xy_, BDC.lib.Colors.BLUE);
-            }
-        }
-
-        pc0 = registersPanel.pc0;
-        pc1 = registersPanel.pc1;
-        pc = pc0 + 10 * pc1;
-        this.highlightInstruction(pc, BDC.lib.Colors.MAGENTA);
+    updateMemory: function (record) {
+        var panel = this.getComponent('memoryPanel');
+        panel.setNCellValue(record.index, record.data.value);
     },
 
-    loadProgram: function (program) {
-        var memoryPanel, registersPanel, i, j, n = 0, pc0, pc1, pc;
-        memoryPanel = this.getComponent('memoryPanel');
-        registersPanel = this.registersPanel();
+    updateMachine: function (record) {
+        var panel = this.registersPanel();
+        panel.setACC(record.data.reg_a);
+        panel.setPC(record.data.reg_pc);
+        panel.setIR(record.data.reg_ir);
 
-        this.reset();
+        panel = this.flagsPanel();
+        panel.setOverflow(record.data.overflow_flag);
 
-        registersPanel.setACCN(program[n++]);
-        registersPanel.setPCN(program[n++]);
-        registersPanel.setIRN(program[n++]);
-
-        for (i = 0; i < 10; i++) {
-            for (j = 0; j < 10; j++) {
-                memoryPanel.setCellValue(i, j, program[n++]);
-            }
+        panel = this.haltPanel();
+        if (record.data.halted) {
+            panel.setHalt();
+        } else {
+            panel.clearHalt();
         }
 
-        registersPanel.setAll();
-        pc0 = registersPanel.pc0;
-        pc1 = registersPanel.pc1;
-        pc = pc0 + 10 * pc1;
-        this.highlightInstruction(pc, BDC.lib.Colors.MAGENTA);
+        this.highlightInstruction(record.data.reg_pc, BDC.lib.Colors.MAGENTA);
     },
 
-    loadAssembledProgram: function (program) {
-        var memoryPanel, i, j, n = 0;
-        memoryPanel = this.getComponent('memoryPanel');
+    dataAccess: function (address) {
+        this.highlightData(address, BDC.lib.Colors.BLUE);
+    },
 
-        this.reset();
-
-        for (i = 0; i < 10; i++) {
-            for (j = 0; j < 10; j++) {
-                memoryPanel.setCellValue(i, j, program[n++]);
-            }
-        }
-
-        this.highlightInstruction(0, BDC.lib.Colors.MAGENTA);
+    indirectAccess: function (address) {
+        this.highlightData(address, BDC.lib.Colors.GREEN);
     }
 });
 
 Ext.define('BDC.controller.Controller', {
     extend: 'Ext.app.Controller',
-    uses: ['BDC.lib.Programs', 'BDC.lib.AssemblerEditor'],
+    uses: ['BDC.lib.Programs', 'BDC.lib.AssemblerEditor', 'BDC.lib.Disassembler'],
+    stores: [ 'Machine', 'Memory', 'Disassembly' ],
     views: [ 'BDC.view.View' ],
     refs: [
         { selector: 'bdc-view', ref: 'BDCView' },
-        { selector: 'panel[itemId=bdc-assembler]', ref: 'Assembler' }
+        { selector: 'panel[itemId=bdc-assembler]', ref: 'Assembler' },
+        { selector: 'panel[itemId=bdc-disassembler]', ref: 'Disassembler' }
     ],
 
     init: function () {
         this.control({
             'bdc-view': {
-                afterrender: this.onViewAfterRender
+                afterrender: this.onReset
             },
             '#assemblerButton': {
                 click: this.onAssembler
+            },
+            '#disassemblerButton': {
+                click: this.onDisassembler
             },
             '#assembleButton': {
                 click: this.onAssemble
@@ -930,17 +739,50 @@ Ext.define('BDC.controller.Controller', {
         });
     },
 
-    onViewAfterRender: function (view) {
-        view.reset();
+    onLaunch: function () {
+        var memory = this.getMemoryStore();
+        var machine = this.getMachineStore();
+        var disassembly = this.getDisassemblyStore();
+
+        memory.on('update', disassembly.onUpdateMemory, disassembly);
+        memory.on('update', this.onUpdateMemory, this);
+
+        machine.on('update', this.onUpdateMachine, this);
+        machine.on('dataAccess', this.onDataAccess, this);
+        machine.on('indirectAccess', this.onIndirectAccess, this);
+    },
+
+    onUpdateMemory: function (store, record, op) {
+        if (op === Ext.data.Model.COMMIT) {
+            this.getBDCView().updateMemory(record);
+        }
+    },
+
+    onUpdateMachine: function (store, record, op) {
+        if (op === Ext.data.Model.COMMIT) {
+            this.getBDCView().updateMachine(record);
+        }
+    },
+
+    onDataAccess: function (address) {
+        this.getBDCView().dataAccess(address);
+    },
+
+    onIndirectAccess: function (address) {
+        this.getBDCView().indirectAccess(address);
     },
 
     onAssembler: function () {
         BDC.lib.AssemblerEditor.show();
     },
 
+    onDisassembler: function () {
+        BDC.lib.Disassembler.show();
+    },
+
     onAssemble: function () {
         var memory, message, editor = this.getAssembler();
-        var view = this.getBDCView();
+        var store = this.getMemoryStore();
 
         try {
             memory = editor.assemble();
@@ -950,41 +792,56 @@ Ext.define('BDC.controller.Controller', {
             return;
         }
 
-        view.loadAssembledProgram(memory);
+        this.onReset();
+        store.loadProgram(memory);
     },
 
     onReset: function () {
         var view = this.getBDCView();
+        var memory = this.getMemoryStore();
+        var machine = this.getMachineStore();
+
+        memory.clear();
+        machine.reset();
         view.reset();
     },
 
     onStep: function () {
         var view = this.getBDCView();
-        view.step();
+        var machine = this.getMachineStore();
+
+        view.setStep();
+        machine.step();
     },
+
     onProgramOne: function () {
-        var view = this.getBDCView();
-        view.loadProgram(BDC.lib.Programs.PROGRAM_ONE);
+        this.loadProgram(BDC.lib.Programs.PROGRAM_ONE);
     },
+
     onProgramTwo: function () {
-        var view = this.getBDCView();
-        view.loadProgram(BDC.lib.Programs.PROGRAM_TWO);
+        this.loadProgram(BDC.lib.Programs.PROGRAM_TWO);
     },
+
     onProgramThree: function () {
-        var view = this.getBDCView();
-        view.loadProgram(BDC.lib.Programs.PROGRAM_THREE);
+        this.loadProgram(BDC.lib.Programs.PROGRAM_THREE);
     },
+
     onProgramFour: function () {
-        var view = this.getBDCView();
-        view.loadProgram(BDC.lib.Programs.PROGRAM_FOUR);
+        this.loadProgram(BDC.lib.Programs.PROGRAM_FOUR);
     },
+
     onProgramFive: function () {
-        var view = this.getBDCView();
-        view.loadProgram(BDC.lib.Programs.PROGRAM_FIVE);
+        this.loadProgram(BDC.lib.Programs.PROGRAM_FIVE);
     },
+
     onProgramSix: function () {
-        var view = this.getBDCView();
-        view.loadProgram(BDC.lib.Programs.PROGRAM_SIX);
+        this.loadProgram(BDC.lib.Programs.PROGRAM_SIX);
+    },
+
+    loadProgram: function (program) {
+        var machine = this.getMachineStore();
+        this.onReset();
+        machine.loadProgram(program);
     }
 });
 
@@ -1646,6 +1503,9 @@ Ext.define('BDC.lib.AssemblerEditor', {
     width: 600,
     height: 375,
     collapsible: true,
+    floating: true,
+    draggable: true,
+    resizable: true,
     statics: {
         show: function () {
             if (Ext.ComponentQuery.query('panel[itemId=bdc-assembler]')[0])
@@ -1720,7 +1580,7 @@ Ext.define('BDC.lib.Frame', {
     title: 'Basic Decimal Computer',
     renderTo: 'bdc-app',
     iconCls: 'cpu-icon',
-    width: 600,
+    width: 610,
     height: 375,
     layout: 'fit',
     items: [
