@@ -32,12 +32,6 @@ Ext.define('BDC.store.Memory', {
         cell.set('value', value % 10);
     },
 
-    setCellRawValue: function (location, value) {
-        this.suspendEvent('update');
-        this.setCellValue(location, value);
-        this.resumeEvent('update');
-    },
-
     clear: function () {
         this.each(function (record) {
             record.set('value', 0);

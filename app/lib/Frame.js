@@ -5,7 +5,7 @@ Ext.define('BDC.lib.Frame', {
     title: 'Basic Decimal Computer',
     renderTo: 'bdc-app',
     iconCls: 'cpu-icon',
-    width: 600,
+    width: 610,
     height: 375,
     layout: 'fit',
     items: [

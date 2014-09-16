@@ -6,12 +6,12 @@ Ext.define('BDC.lib.StatusPanel', {
         'BDC.lib.FlagsPanel',
         'BDC.lib.HaltPanel'
     ],
-    columnWidth: 0.18,
+    width: 130,
     layout: {
         type: 'vbox',
         align: 'center'
     },
-    padding: '10px 5px 10px 0px',
+    padding: '10 0 0 0',
     border: false,
     items: [
         {

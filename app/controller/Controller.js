@@ -1,7 +1,7 @@
 Ext.define('BDC.controller.Controller', {
     extend: 'Ext.app.Controller',
     uses: ['BDC.lib.Programs', 'BDC.lib.AssemblerEditor', 'BDC.lib.Disassembler'],
-    stores: [ 'Machine', 'Memory' ],
+    stores: [ 'Machine', 'Memory', 'Disassembly' ],
     views: [ 'BDC.view.View' ],
     refs: [
         { selector: 'bdc-view', ref: 'BDCView' },
@@ -53,8 +53,11 @@ Ext.define('BDC.controller.Controller', {
     onLaunch: function () {
         var memory = this.getMemoryStore();
         var machine = this.getMachineStore();
+        var disassembly = this.getDisassemblyStore();
 
+        memory.on('update', disassembly.onUpdateMemory, disassembly);
         memory.on('update', this.onUpdateMemory, this);
+
         machine.on('update', this.onUpdateMachine, this);
         machine.on('dataAccess', this.onDataAccess, this);
         machine.on('indirectAccess', this.onIndirectAccess, this);

@@ -221,3 +221,7 @@ i {
     background-image: -o-linear-gradient(top, #ffcc00, #FFDE73);
     background-image: linear-gradient(top, #ffcc00, #FFDE73);
 }
+
+.x-grid-cell {
+    font-family: "Menlo", "Courier New", "Courier", monospace;
+}

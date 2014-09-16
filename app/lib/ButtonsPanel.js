@@ -5,10 +5,10 @@ Ext.define('BDC.lib.ButtonsPanel', {
         type: 'vbox',
         align: 'center'
     },
-    columnWidth: 0.22,
+    width: 130,
     height: 350,
     title: 'Options',
-    padding: '10px',
+    padding: '10 10 10 10',
     items: [
         {
             border: false,
