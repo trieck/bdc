@@ -9,6 +9,9 @@ Ext.define('BDC.lib.AssemblerEditor', {
     width: 600,
     height: 375,
     collapsible: true,
+    floating: true,
+    draggable: true,
+    resizable: true,
     statics: {
         show: function () {
             if (Ext.ComponentQuery.query('panel[itemId=bdc-assembler]')[0])

@@ -5,10 +5,10 @@ Ext.define('BDC.lib.ButtonsPanel', {
         type: 'vbox',
         align: 'center'
     },
-    columnWidth: 0.2,
+    width: 130,
     height: 350,
     title: 'Options',
-    padding: '10px',
+    padding: '10 10 10 10',
     items: [
         {
             border: false,
@@ -116,6 +116,21 @@ Ext.define('BDC.lib.ButtonsPanel', {
             focusCls: '',
             id: 'assemblerButton',
             iconCls: 'assemble-icon',
+            iconAlign: 'top',
+            width: '80%',
+            flex: 0.6
+        },
+        {
+            border: false,
+            flex: 0.10
+        },
+        {
+            xtype: 'button',
+            tooltip: { text: 'Launch Disassembler' },
+            text: 'DISASSEMBLER',
+            focusCls: '',
+            id: 'disassemblerButton',
+            iconCls: 'disassemble-icon',
             iconAlign: 'top',
             width: '80%',
             flex: 0.6

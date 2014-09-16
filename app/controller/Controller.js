@@ -1,19 +1,24 @@
 Ext.define('BDC.controller.Controller', {
     extend: 'Ext.app.Controller',
-    uses: ['BDC.lib.Programs', 'BDC.lib.AssemblerEditor'],
+    uses: ['BDC.lib.Programs', 'BDC.lib.AssemblerEditor', 'BDC.lib.Disassembler'],
+    stores: [ 'Machine', 'Memory', 'Disassembly' ],
     views: [ 'BDC.view.View' ],
     refs: [
         { selector: 'bdc-view', ref: 'BDCView' },
-        { selector: 'panel[itemId=bdc-assembler]', ref: 'Assembler' }
+        { selector: 'panel[itemId=bdc-assembler]', ref: 'Assembler' },
+        { selector: 'panel[itemId=bdc-disassembler]', ref: 'Disassembler' }
     ],
 
     init: function () {
         this.control({
             'bdc-view': {
-                afterrender: this.onViewAfterRender
+                afterrender: this.onReset
             },
             '#assemblerButton': {
                 click: this.onAssembler
+            },
+            '#disassemblerButton': {
+                click: this.onDisassembler
             },
             '#assembleButton': {
                 click: this.onAssemble
@@ -45,17 +50,50 @@ Ext.define('BDC.controller.Controller', {
         });
     },
 
-    onViewAfterRender: function (view) {
-        view.reset();
+    onLaunch: function () {
+        var memory = this.getMemoryStore();
+        var machine = this.getMachineStore();
+        var disassembly = this.getDisassemblyStore();
+
+        memory.on('update', disassembly.onUpdateMemory, disassembly);
+        memory.on('update', this.onUpdateMemory, this);
+
+        machine.on('update', this.onUpdateMachine, this);
+        machine.on('dataAccess', this.onDataAccess, this);
+        machine.on('indirectAccess', this.onIndirectAccess, this);
+    },
+
+    onUpdateMemory: function (store, record, op) {
+        if (op === Ext.data.Model.COMMIT) {
+            this.getBDCView().updateMemory(record);
+        }
+    },
+
+    onUpdateMachine: function (store, record, op) {
+        if (op === Ext.data.Model.COMMIT) {
+            this.getBDCView().updateMachine(record);
+        }
+    },
+
+    onDataAccess: function (address) {
+        this.getBDCView().dataAccess(address);
+    },
+
+    onIndirectAccess: function (address) {
+        this.getBDCView().indirectAccess(address);
     },
 
     onAssembler: function () {
         BDC.lib.AssemblerEditor.show();
     },
 
+    onDisassembler: function () {
+        BDC.lib.Disassembler.show();
+    },
+
     onAssemble: function () {
         var memory, message, editor = this.getAssembler();
-        var view = this.getBDCView();
+        var store = this.getMemoryStore();
 
         try {
             memory = editor.assemble();
@@ -65,40 +103,55 @@ Ext.define('BDC.controller.Controller', {
             return;
         }
 
-        view.loadAssembledProgram(memory);
+        this.onReset();
+        store.loadProgram(memory);
     },
 
     onReset: function () {
         var view = this.getBDCView();
+        var memory = this.getMemoryStore();
+        var machine = this.getMachineStore();
+
+        memory.clear();
+        machine.reset();
         view.reset();
     },
 
     onStep: function () {
         var view = this.getBDCView();
-        view.step();
+        var machine = this.getMachineStore();
+
+        view.setStep();
+        machine.step();
     },
+
     onProgramOne: function () {
-        var view = this.getBDCView();
-        view.loadProgram(BDC.lib.Programs.PROGRAM_ONE);
+        this.loadProgram(BDC.lib.Programs.PROGRAM_ONE);
     },
+
     onProgramTwo: function () {
-        var view = this.getBDCView();
-        view.loadProgram(BDC.lib.Programs.PROGRAM_TWO);
+        this.loadProgram(BDC.lib.Programs.PROGRAM_TWO);
     },
+
     onProgramThree: function () {
-        var view = this.getBDCView();
-        view.loadProgram(BDC.lib.Programs.PROGRAM_THREE);
+        this.loadProgram(BDC.lib.Programs.PROGRAM_THREE);
     },
+
     onProgramFour: function () {
-        var view = this.getBDCView();
-        view.loadProgram(BDC.lib.Programs.PROGRAM_FOUR);
+        this.loadProgram(BDC.lib.Programs.PROGRAM_FOUR);
     },
+
     onProgramFive: function () {
-        var view = this.getBDCView();
-        view.loadProgram(BDC.lib.Programs.PROGRAM_FIVE);
+        this.loadProgram(BDC.lib.Programs.PROGRAM_FIVE);
     },
+
     onProgramSix: function () {
-        var view = this.getBDCView();
-        view.loadProgram(BDC.lib.Programs.PROGRAM_SIX);
+        this.loadProgram(BDC.lib.Programs.PROGRAM_SIX);
+    },
+
+    loadProgram: function (program) {
+        var machine = this.getMachineStore();
+        this.onReset();
+        machine.loadProgram(program);
     }
 });

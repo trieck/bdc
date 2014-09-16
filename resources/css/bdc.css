@@ -15,6 +15,10 @@ body {
     background-image: url(../images/cpu.png) !important;
 }
 
+.disassemble-icon {
+    background-image: url(../images/disassemble.png) !important;
+}
+
 .halt-icon {
     background-image: url(../images/halt.png) !important;
     background-repeat: no-repeat;
@@ -212,4 +216,8 @@ body {
     background-image: -moz-linear-gradient(top, #ffcc00, #FFDE73);
     background-image: -o-linear-gradient(top, #ffcc00, #FFDE73);
     background-image: linear-gradient(top, #ffcc00, #FFDE73);
+}
+
+.x-grid-cell {
+    font-family: "Menlo", "Courier New", "Courier", monospace;
 }

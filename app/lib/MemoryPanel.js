@@ -3,20 +3,23 @@ Ext.define('BDC.lib.MemoryPanel', {
     alias: 'widget.memory-panel',
     title: 'Main Memory',
     uses: [ 'BDC.lib.Colors', 'BDC.lib.DigitValidator' ],
-    columnWidth: 0.6,
+    width: 350,
     height: 350,
     layout: {
         type: 'table',
         columns: 11
     },
-    padding: '10px',
+    padding: '10 0 10 5',
 
     keyPress: function (field, event) {
-        var code = event.getCharCode();
+        var code = event.getCharCode(), store;
         if (code < 48 || code > 57) {
             event.stopEvent();
             return;
         }
+
+        store = Ext.getStore('Memory');
+        store.setCellValue(this.cellId, code - 48);
 
         field.setRawValue('');
     },
@@ -55,6 +58,7 @@ Ext.define('BDC.lib.MemoryPanel', {
                 emptyText: '0',
                 width: 25,
                 itemId: 'memory-cell-' + i,
+                cellId: i,
                 vtype: 'digit',
                 enableKeyEvents: true,
                 listeners: {
@@ -121,13 +125,6 @@ Ext.define('BDC.lib.MemoryPanel', {
     getCellValue: function (i, j) {
         var cell = this.getCell(i, j);
         return cell.getValue() % 10;
-    },
-
-    getNCellValue: function (n) {
-        var i, j;
-        i = Math.floor(n / 10) % 10;
-        j = n % 10;
-        return this.getCellValue(i, j);
     },
 
     setCellValue: function (i, j, value) {
