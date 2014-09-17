@@ -5,8 +5,7 @@ Ext.define('BDC.controller.Controller', {
     views: [ 'BDC.view.View' ],
     refs: [
         { selector: 'bdc-view', ref: 'BDCView' },
-        { selector: 'panel[itemId=bdc-assembler]', ref: 'Assembler' },
-        { selector: 'panel[itemId=bdc-disassembler]', ref: 'Disassembler' }
+        { selector: 'panel[itemId=bdc-assembler]', ref: 'Assembler' }
     ],
 
     init: function () {
