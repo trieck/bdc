@@ -10,6 +10,11 @@
             },
             "files": [
                 {
+                    "clsName": "BDC.store.Disassembly",
+                    "name": "Disassembly.js",
+                    "path": "app/store/"
+                },
+                {
                     "clsName": "BDC.lib.ButtonsPanel",
                     "name": "ButtonsPanel.js",
                     "path": "app/lib/"
@@ -18,6 +23,16 @@
                     "clsName": "BDC.lib.MemoryPanel",
                     "name": "MemoryPanel.js",
                     "path": "app/lib/"
+                },
+                {
+                    "clsName": "BDC.model.Machine",
+                    "name": "Machine.js",
+                    "path": "app/model/"
+                },
+                {
+                    "clsName": "BDC.model.MemoryCell",
+                    "name": "MemoryCell.js",
+                    "path": "app/model/"
                 },
                 {
                     "clsName": "BDC.lib.FlagsPanel",
@@ -33,6 +48,16 @@
                     "clsName": "BDC.lib.DigitValidator",
                     "name": "DigitValidator.js",
                     "path": "app/lib/"
+                },
+                {
+                    "clsName": "BDC.store.Machine",
+                    "name": "Machine.js",
+                    "path": "app/store/"
+                },
+                {
+                    "clsName": "BDC.store.Memory",
+                    "name": "Memory.js",
+                    "path": "app/store/"
                 },
                 {
                     "clsName": "BDC.lib.RegistersPanel",
@@ -72,6 +97,11 @@
                 {
                     "clsName": "BDC.lib.AssemblerEditor",
                     "name": "AssemblerEditor.js",
+                    "path": "app/lib/"
+                },
+                {
+                    "clsName": "BDC.lib.Disassembler",
+                    "name": "Disassembler.js",
                     "path": "app/lib/"
                 },
                 {

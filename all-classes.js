@@ -1,6 +1,123 @@
 /*
 Copyright(c) 2014 Michael Q. Rieck, Thomas A. Rieck
 */
+/**
+ * Store to represent disassembled memory
+ */
+Ext.define('BDC.store.Disassembly', {
+    extend: 'Ext.data.Store',
+    autoLoad: true,
+    autoSync: true,
+    statics: {
+        addressTbl: {
+            2: '[W]',
+            4: '[X]',
+            6: '[Y]',
+            8: '[Z]',
+            80: 'Q',
+            82: 'R',
+            84: 'S',
+            86: 'T',
+            88: 'U',
+            90: 'V',
+            92: 'W',
+            94: 'X',
+            96: 'Y',
+            98: 'Z'
+        }
+    },
+    fields: [
+        { name: 'location', type: 'int' },
+        { name: 'instruction', type: 'string' },
+        { name: 'ir', type: 'auto' }
+    ],
+    data: Array.apply(null, new Array(26)).map(function (el, index) {
+        return { location: index * 3, instruction: 'HALT', ir: [ 0, 0, 0 ] };
+    }),
+
+    onUpdateMemory: function (store, record, op) {
+        if (op === Ext.data.Model.COMMIT) {
+            if (record.index > (26 - 1) * 3)
+                return; // out of range
+
+            this.updateMemory(record);
+        }
+    },
+
+    updateMemory: function (mem_record) {
+        var index = Math.floor(mem_record.index / 3);
+        var record = this.getAt(index);
+        var pos = mem_record.index % 3;
+        var ir = record.get('ir');
+        ir[pos] = mem_record.data.value;
+        record.set('ir', ir);
+        this.format(record);
+    },
+
+    format: function (record) {
+        var instruction;
+        var ir = record.get('ir');
+        switch (ir[2]) {
+            case 0:
+                if (ir[0] === 0 && ir[1] === 0) {
+                    instruction = 'HALT';
+                } else {
+                    instruction = Ext.String.format("J {0}{1}", ir[1], ir[0]);
+                }
+                break;
+            case 1:
+                instruction = Ext.String.format("JO {0}{1}", ir[1], ir[0]);
+                break;
+            case 2:
+                instruction = Ext.String.format("JNO {0}{1}", ir[1], ir[0]);
+                break;
+            case 3:
+                instruction = Ext.String.format("LOADI {0}{1}", ir[1], ir[0]);
+                break;
+            case 4:
+                instruction = Ext.String.format("LOAD {0}", this.formatAddress(record));
+                break;
+            case 5:
+                instruction = Ext.String.format("ADD {0}", this.formatAddress(record));
+                break;
+            case 6:
+                instruction = Ext.String.format("SUB {0}", this.formatAddress(record));
+                break;
+            case 7:
+                instruction = Ext.String.format("STORE {0}", this.formatAddress(record));
+                break;
+            case 8:
+                if (ir[0] === 0 && ir[1] === 0) {
+                    instruction = Ext.String.format("INC A");
+                } else {
+                    instruction = Ext.String.format("INC {0}", this.formatAddress(record));
+                }
+                break;
+            case 9:
+                if (ir[0] === 0 && ir[1] === 0) {
+                    instruction = Ext.String.format("DEC A");
+                } else {
+                    instruction = Ext.String.format("DEC {0}", this.formatAddress(record));
+                }
+                break;
+        }
+
+        record.set('instruction', instruction);
+    },
+
+    formatAddress: function (record) {
+        var ir = record.get('ir');
+        var address = ir[1] * 10 + ir[0];
+        var symbol;
+        if ((symbol = this.self.addressTbl[address]) !== undefined) {
+            return symbol;
+        }
+
+        return Ext.String.format("{0}{1}", ir[1], ir[0]);
+    }
+});
+
+
 Ext.define('BDC.lib.ButtonsPanel', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.buttons-panel',
@@ -8,10 +125,10 @@ Ext.define('BDC.lib.ButtonsPanel', {
         type: 'vbox',
         align: 'center'
     },
-    width: 130,
+    width: 140,
     height: 350,
     title: 'Options',
-    padding: '10 10 10 10',
+    padding: '10 10 10 15',
     items: [
         {
             border: false,
@@ -166,7 +283,7 @@ Ext.define('BDC.lib.MemoryPanel', {
         }
 
         store = Ext.getStore('Memory');
-        store.setCellValue(this.cellId, code - 48);
+        store.setCellValue(this.cellIndex, code - 48);
 
         field.setRawValue('');
     },
@@ -205,7 +322,7 @@ Ext.define('BDC.lib.MemoryPanel', {
                 emptyText: '0',
                 width: 25,
                 itemId: 'memory-cell-' + i,
-                cellId: i,
+                cellIndex: i,
                 vtype: 'digit',
                 enableKeyEvents: true,
                 listeners: {
@@ -289,6 +406,28 @@ Ext.define('BDC.lib.MemoryPanel', {
 
 
 
+/**
+ * Model for BDC machine
+ */
+Ext.define('BDC.model.Machine', {
+    extend: 'Ext.data.Model',
+    fields: [
+        { name: 'halted', type: 'boolean' },
+        { name: 'overflow_flag', type: 'boolean' },
+        { name: 'reg_a', type: 'int' },
+        { name: 'reg_pc', type: 'int' },
+        { name: 'reg_ir', type: 'int' }
+    ]
+});
+/**
+ * Model for an individual memory cell
+ */
+Ext.define('BDC.model.MemoryCell', {
+    extend: 'Ext.data.Model',
+    fields: [
+        { name: 'value', type: 'int' }
+    ]
+});
 Ext.define('BDC.lib.FlagsPanel', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.flags-panel',
@@ -371,6 +510,374 @@ Ext.define('BDC.lib.DigitValidator', function () {
     return this;
 }());
 
+
+/**
+ * Store to represent machine
+ */
+Ext.define('BDC.store.Machine', {
+    extend: 'Ext.data.Store',
+    model: 'BDC.model.Machine',
+    autoLoad: true,
+    autoSync: true,
+    data: {
+        halted: false,
+        overflow_flag: false,
+        reg_a: 0,
+        reg_pc: 0,
+        reg_ir: 0
+    },
+    proxy: {
+        type: 'memory'
+    },
+
+    /**
+     * Get the one and only model instance
+     * @private
+     */
+    getRecord: function () {
+        return this.getAt(0);
+    },
+
+    /**
+     * Get halted state
+     * @public
+     * @returns {boolean}
+     */
+    getHalted: function () {
+        return this.getRecord().get('halted');
+    },
+
+    /**
+     * Set halted state
+     * @public
+     * @param value
+     */
+    setHalted: function (value) {
+        this.getRecord().set('halted', !!value);
+    },
+
+    /**
+     * Get overflow flag
+     * @public
+     * @returns {boolean}
+     */
+    getOverflow: function () {
+        return this.getRecord().get('overflow_flag');
+    },
+
+    /**
+     * Set overflow flag
+     * @public
+     * @param value
+     */
+    setOverflow: function (value) {
+        this.getRecord().set('overflow_flag', !!value);
+    },
+
+    /**
+     * Get accumulator register
+     * @public
+     * @returns {Number}
+     */
+    getACC: function () {
+        return this.getRecord().get('reg_a');
+    },
+
+    /**
+     * Set acccumulator register
+     * @public
+     * @param value
+     */
+    setACC: function (value) {
+        this.getRecord().set('reg_a', value % 100);
+    },
+
+    /**
+     * Set acccumulator register without event
+     * @public
+     * @param value
+     */
+    setACCRaw: function (value) {
+        this.suspendEvent('update');
+        this.setACC(value);
+        this.resumeEvent('update');
+    },
+
+    /**
+     * Set PC register
+     * @public
+     * @param value
+     */
+    setPC: function (value) {
+        this.getRecord().set('reg_pc', value % 100);
+    },
+
+    /**
+     * Set PC register without event
+     * @public
+     * @param value
+     */
+    setPCRaw: function (value) {
+        this.suspendEvent('update');
+        this.setPC(value);
+        this.resumeEvent('update');
+    },
+
+    /**
+     * Get PC register
+     * @public
+     * @returns {Number}
+     */
+    getPC: function () {
+        return this.getRecord().get('reg_pc');
+    },
+
+    /**
+     * Set IR register
+     * @public
+     * @param value
+     */
+    setIR: function (value) {
+        this.getRecord().set('reg_ir', value % 1000);
+    },
+
+    /**
+     * Set IR register without event
+     * @public
+     * @param value
+     */
+    setIRRaw: function (value) {
+        this.suspendEvent('update');
+        this.setIR(value);
+        this.resumeEvent('update');
+    },
+
+    /**
+     * Get IR register
+     * @public
+     * @returns {Number}
+     */
+    getIR: function () {
+        return this.getRecord().get('reg_ir');
+    },
+
+    /**
+     * Reset the machine
+     * @public
+     */
+    reset: function () {
+        this.startBatch();
+        this.setHalted(false);
+        this.setOverflow(false);
+        this.setACC(0);
+        this.setPC(0);
+        this.setIR(0);
+        this.endBatch();
+    },
+
+    /**
+     * Suspend update events
+     * @private
+     */
+    startBatch: function () {
+        this.suspendEvent('update');
+    },
+
+    /**
+     * Resume update events
+     * and fire update event
+     * @private
+     */
+    endBatch: function () {
+        this.resumeEvent('update');
+        this.fireEventArgs('update', [ this, this.getRecord(), Ext.data.Model.COMMIT ]);
+    },
+
+    /**
+     * Step the machine
+     * @public
+     */
+    step: function () {
+        var pc = this.getPC();
+        var overflow = this.getOverflow();
+        var memory = Ext.getStore('Memory');
+        var value;
+        var ir0 = memory.getCellValue(pc);
+        var ir1 = memory.getCellValue(++pc);
+        var ir2 = memory.getCellValue(++pc);
+        var address = ir0 + 10 * ir1;
+        var address_ = address;
+        var acc = this.getACC();
+
+        pc = (pc + 1) % 100;
+
+        this.startBatch();
+
+        this.setPC(pc);
+        this.setIR(ir2 * 100 + ir1 * 10 + ir0);
+
+        if (ir2 >= 4 && ir0 === 0 && ir1 === 0) {   // accumulator addressing
+            value = acc;
+        } else if (ir2 >= 4 && ir1 === 0) {         // indirect addressing
+            address_ = memory.getWord(ir0 + 90);
+            value = memory.getWord(address_);
+        } else if (ir2 >= 4 && ir2 !== 7) {         // memory access
+            value = memory.getWord(address);
+        }
+
+        switch (ir2) {
+            case 0: // branch or halt
+                if (ir0 !== 0 || ir1 !== 0) {
+                    this.setPC(pc + address);
+                } else {
+                    this.setPC(pc + 97);
+                    this.setHalted(true);
+                }
+                break;
+            case 1: // branch on overflow
+                if (overflow) {
+                    if (ir0 !== 0 || ir1 !== 0) {
+                        this.setPC(pc + address);
+                    } else {
+                        this.setPC(pc + 97);
+                        this.setHalted(true);
+                    }
+                }
+                break;
+            case 2: // branch on not overflow
+                if (!overflow) {
+                    if (ir0 !== 0 || ir1 !== 0) {
+                        this.setPC(pc + address);
+                    } else {
+                        this.setPC(pc + 97);
+                        this.setHalted(true);
+                    }
+                }
+                break;
+            case 3: // load immediate accumulator
+                this.setACC(address);
+                break;
+            case 4: // fetch to accumulator
+                this.setACC(value);
+                break;
+            case 5: // add to accumulator
+                overflow = acc + value > 99;
+                this.setACC(acc + value);
+                this.setOverflow(overflow);
+                break;
+            case 6: // subtract from accumulator
+                overflow = acc < value;
+                this.setACC(100 + acc - value);
+                this.setOverflow(overflow);
+                break;
+            case 7: // store accumulator
+                if (address !== 0) {
+                    memory.setWord(address_, acc);
+                }
+                break;
+            case 8: // increment memory value
+                overflow = value === 99;
+                value = (value + 1) % 100;
+                if (address === 0) {
+                    this.setACC(value);
+                } else {
+                    memory.setWord(address_, value);
+                }
+                this.setOverflow(overflow);
+                break;
+            case 9: // decrement memory value
+                overflow = value === 0;
+                value = (value + 99) % 100;
+                if (address === 0) {
+                    this.setACC(value);
+                } else {
+                    memory.setWord(address_, value);
+                }
+                this.setOverflow(overflow);
+                break;
+        }
+
+        this.endBatch();
+
+        if (ir2 >= 4) {
+            if (ir1 !== 0) {
+                this.fireEvent('dataAccess', address);
+            } else if (ir0 !== 0) {
+                this.fireEvent('indirectAccess', 90 + address);
+                this.fireEvent('dataAccess', address_);
+            }
+        }
+    },
+
+    /**
+     * Load canned program
+     * @public
+     * @param program
+     */
+    loadProgram: function (program) {
+        var i, n = 0;
+
+        var memory = Ext.getStore('Memory');
+
+        this.startBatch();
+        this.setACC(program[n++]);
+        this.setPC(program[n++]);
+        this.setIR(program[n++]);
+        this.endBatch();
+
+        for (i = 0; i < 100; ++i) {
+            memory.setCellValue(i, program[n++]);
+        }
+    }
+});
+
+/**
+ * Store to represent main memory
+ */
+Ext.define('BDC.store.Memory', {
+    extend: 'Ext.data.ArrayStore',
+    model: 'BDC.model.MemoryCell',
+    autoLoad: true,
+    autoSync: true,
+    expandData: true,
+    data: Array.apply(null, new Array(100)).map(Number.prototype.valueOf, 0),
+
+    getCellValue: function (location) {
+        var cell = this.getAt(location % 100);
+        return cell.get('value');
+    },
+
+    getWord: function (location) {
+        var cell0 = this.getCellValue(location);
+        var cell1 = this.getCellValue(location + 1);
+        return cell0 + 10 * cell1;
+    },
+
+    setWord: function (location, value) {
+        var v1 = Math.floor(value / 10);
+        var v0 = value % 10;
+        this.setCellValue(location, v0);
+        this.setCellValue(location + 1, v1);
+    },
+
+    setCellValue: function (location, value) {
+        var cell = this.getAt(location % 100);
+        cell.set('value', value % 10);
+    },
+
+    clear: function () {
+        this.each(function (record) {
+            record.set('value', 0);
+        });
+    },
+
+    loadProgram: function (program) {
+        var i;
+        for (i = 0; i < 100; ++i) {
+            this.setCellValue(i, program[i]);
+        }
+    }
+});
 
 Ext.define('BDC.lib.RegistersPanel', {
     extend: 'Ext.panel.Panel',
@@ -571,7 +1078,6 @@ Ext.define('BDC.view.View', {
     alias: 'widget.bdc-view',
     requires: [ 'BDC.lib.ButtonsPanel', 'BDC.lib.MemoryPanel', 'BDC.lib.StatusPanel' ],
     uses: [ 'BDC.lib.Colors'],
-    width: 610,
     height: 350,
     border: false,
     layout: {
@@ -694,8 +1200,7 @@ Ext.define('BDC.controller.Controller', {
     views: [ 'BDC.view.View' ],
     refs: [
         { selector: 'bdc-view', ref: 'BDCView' },
-        { selector: 'panel[itemId=bdc-assembler]', ref: 'Assembler' },
-        { selector: 'panel[itemId=bdc-disassembler]', ref: 'Disassembler' }
+        { selector: 'panel[itemId=bdc-assembler]', ref: 'Assembler' }
     ],
 
     init: function () {
@@ -1573,6 +2078,70 @@ Ext.define('BDC.lib.AssemblerEditor', {
     }
 });
 
+Ext.define('BDC.lib.Disassembler', {
+    extend: 'Ext.grid.Panel',
+    itemId: 'bdc-disassembler',
+    title: 'BDC Disassembler',
+    renderTo: 'bdc-disassembler',
+    iconCls: 'disassemble-icon',
+    closable: true,
+    width: 300,
+    height: 400,
+    collapsible: true,
+    floating: true,
+    draggable: true,
+    resizable: true,
+    statics: {
+        show: function () {
+            if (Ext.ComponentQuery.query('panel[itemId=bdc-disassembler]')[0])
+                return; // shown
+            return Ext.create('BDC.lib.Disassembler');
+        }
+    },
+    viewConfig: {
+        stripeRows: true,
+        enableTextSelection: true
+    },
+
+    scroll: 'vertical',
+    sortableColumns: false,
+    rowLines: false,
+    columns: [
+        {
+            text: 'Location',
+            dataIndex: 'location',
+            flex: 1,
+            draggable: false,
+            menuDisabled: true,
+            sortable: false,
+            resizable: true,
+            renderer: function (val) {
+                val = val % 100;
+                var hi = Math.floor(val / 10);
+                var lo = val % 10;
+                return Ext.String.format("{0}{1}", hi, lo);
+            }
+        },
+        {
+            text: 'Instruction',
+            dataIndex: 'instruction',
+            flex: 2,
+            draggable: false,
+            menuDisabled: true,
+            sortable: false,
+            resizable: true
+        }
+    ],
+
+    initComponent: function () {
+        this.store = Ext.getStore('Disassembly');
+        this.callParent(arguments);
+    }
+});
+
+
+
+
 Ext.define('BDC.lib.Frame', {
     extend: 'Ext.panel.Panel',
     alias: 'bdc-frame',
@@ -1580,7 +2149,7 @@ Ext.define('BDC.lib.Frame', {
     title: 'Basic Decimal Computer',
     renderTo: 'bdc-app',
     iconCls: 'cpu-icon',
-    width: 610,
+    width: 625,
     height: 375,
     layout: 'fit',
     items: [

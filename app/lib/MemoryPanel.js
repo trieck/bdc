@@ -19,7 +19,7 @@ Ext.define('BDC.lib.MemoryPanel', {
         }
 
         store = Ext.getStore('Memory');
-        store.setCellValue(this.cellId, code - 48);
+        store.setCellValue(this.cellIndex, code - 48);
 
         field.setRawValue('');
     },
@@ -58,7 +58,7 @@ Ext.define('BDC.lib.MemoryPanel', {
                 emptyText: '0',
                 width: 25,
                 itemId: 'memory-cell-' + i,
-                cellId: i,
+                cellIndex: i,
                 vtype: 'digit',
                 enableKeyEvents: true,
                 listeners: {
