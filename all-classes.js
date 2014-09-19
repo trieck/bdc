@@ -9,7 +9,7 @@ Ext.define('BDC.store.Disassembly', {
     autoLoad: true,
     autoSync: true,
     statics: {
-        addressTbl: {
+        ADDRESS_TABLE: {
             2: '[W]',
             4: '[X]',
             6: '[Y]',
@@ -37,7 +37,7 @@ Ext.define('BDC.store.Disassembly', {
 
     onUpdateMemory: function (store, record, op) {
         if (op === Ext.data.Model.COMMIT) {
-            if (record.index > (26 - 1) * 3)
+            if (record.index > 25 * 3)
                 return; // out of range
 
             this.updateMemory(record);
@@ -62,14 +62,14 @@ Ext.define('BDC.store.Disassembly', {
                 if (ir[0] === 0 && ir[1] === 0) {
                     instruction = 'HALT';
                 } else {
-                    instruction = Ext.String.format("J {0}{1}", ir[1], ir[0]);
+                    instruction = Ext.String.format("J {0}", this.formatTarget(record));
                 }
                 break;
             case 1:
-                instruction = Ext.String.format("JO {0}{1}", ir[1], ir[0]);
+                instruction = Ext.String.format("JO {0}", this.formatTarget(record));
                 break;
             case 2:
-                instruction = Ext.String.format("JNO {0}{1}", ir[1], ir[0]);
+                instruction = Ext.String.format("JNO {0}", this.formatTarget(record));
                 break;
             case 3:
                 instruction = Ext.String.format("LOADI {0}{1}", ir[1], ir[0]);
@@ -105,11 +105,37 @@ Ext.define('BDC.store.Disassembly', {
         record.set('instruction', instruction);
     },
 
+    /**
+     * Format branch target
+     * @param record
+     * @returns {String}
+     * @private
+     */
+    formatTarget: function (record) {
+        var ir, address, location, value, lo, hi;
+        ir = record.get('ir');
+        location = record.get('location');
+        address = ir[1] * 10 + ir[0];
+        value = (location + 3) - (100 - address);
+        value = ((value % 100) + 100) % 100;
+        hi = Math.floor(value / 10);
+        lo = value % 10;
+
+        return Ext.String.format("{0}{1}", hi, lo);
+    },
+
+    /**
+     * Format address
+     * @param record
+     * @returns {String}
+     * @private
+     */
+
     formatAddress: function (record) {
         var ir = record.get('ir');
         var address = ir[1] * 10 + ir[0];
         var symbol;
-        if ((symbol = this.self.addressTbl[address]) !== undefined) {
+        if ((symbol = this.self.ADDRESS_TABLE[address]) !== undefined) {
             return symbol;
         }
 
@@ -1928,13 +1954,14 @@ Ext.define('BDC.lib.Assembler', {
         if (this.tt !== this.self.TT_NUMBER && this.tt !== this.self.TT_ID)
             this.syntax_error();
 
-        if (this.tt === this.self.TT_NUMBER)
-            return this.parseValue();
+        if (this.tt === this.self.TT_NUMBER) {
+            value = this.parseValue();
+            value = this.getOffset(value);
+            return value;
+        }
 
         if ((value = this.symbols[this.token]) !== undefined) {
-            // calculate real offset
-            value = ((this.self.PROGRAM_SIZE - this.o_index) + value) - 3;
-            value = ((value % this.self.PROGRAM_SIZE) + this.self.PROGRAM_SIZE) % this.self.PROGRAM_SIZE;
+            value = this.getOffset(value);
             return value;
         }
 
@@ -1942,6 +1969,19 @@ Ext.define('BDC.lib.Assembler', {
         this.refs.push({ name: this.token, location: this.o_index, line_no: this.line_no });
 
         return 0;
+    },
+
+    /**
+     * Calculate real offset for branch
+     * from memory location
+     * @param value
+     * @returns {Number}
+     * @private
+     */
+    getOffset: function (value) {
+        value = ((this.self.PROGRAM_SIZE - this.o_index) + value) - 3;
+        value = ((value % this.self.PROGRAM_SIZE) + this.self.PROGRAM_SIZE) % this.self.PROGRAM_SIZE;
+        return value;
     },
 
     /**

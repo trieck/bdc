@@ -499,13 +499,14 @@ Ext.define('BDC.lib.Assembler', {
         if (this.tt !== this.self.TT_NUMBER && this.tt !== this.self.TT_ID)
             this.syntax_error();
 
-        if (this.tt === this.self.TT_NUMBER)
-            return this.parseValue();
+        if (this.tt === this.self.TT_NUMBER) {
+            value = this.parseValue();
+            value = this.getOffset(value);
+            return value;
+        }
 
         if ((value = this.symbols[this.token]) !== undefined) {
-            // calculate real offset
-            value = ((this.self.PROGRAM_SIZE - this.o_index) + value) - 3;
-            value = ((value % this.self.PROGRAM_SIZE) + this.self.PROGRAM_SIZE) % this.self.PROGRAM_SIZE;
+            value = this.getOffset(value);
             return value;
         }
 
@@ -513,6 +514,19 @@ Ext.define('BDC.lib.Assembler', {
         this.refs.push({ name: this.token, location: this.o_index, line_no: this.line_no });
 
         return 0;
+    },
+
+    /**
+     * Calculate real offset for branch
+     * from memory location
+     * @param value
+     * @returns {Number}
+     * @private
+     */
+    getOffset: function (value) {
+        value = ((this.self.PROGRAM_SIZE - this.o_index) + value) - 3;
+        value = ((value % this.self.PROGRAM_SIZE) + this.self.PROGRAM_SIZE) % this.self.PROGRAM_SIZE;
+        return value;
     },
 
     /**
