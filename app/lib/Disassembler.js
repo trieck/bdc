@@ -5,7 +5,7 @@ Ext.define('BDC.lib.Disassembler', {
     renderTo: 'bdc-disassembler',
     iconCls: 'disassemble-icon',
     closable: true,
-    width: 300,
+    width: 320,
     height: 400,
     collapsible: true,
     floating: true,
@@ -43,7 +43,19 @@ Ext.define('BDC.lib.Disassembler', {
             }
         },
         {
-            text: 'Instruction',
+            text: 'Opcode / Operands',
+            dataIndex: 'ir',
+            flex: 2,
+            draggable: false,
+            menuDisabled: true,
+            sortable: false,
+            resizable: true,
+            renderer: function (ir) {
+                return Ext.String.format("{0} {1} {2}", ir[2], ir[1], ir[0]);
+            }
+        },
+        {
+            text: 'Mnemonic Instruction',
             dataIndex: 'instruction',
             flex: 2,
             draggable: false,
