@@ -58,17 +58,17 @@ Ext.define('BDC.lib.ButtonsPanel', {
             menu: {
                 items: [
                     {
-                        text: 'Multiply x and y',
+                        text: 'Multiply X and Y',
                         id: 'programOne',
                         iconCls: 'tape-icon'
                     },
                     {
-                        text: 'Divide x by y',
+                        text: 'Divide X by Y',
                         id: 'programTwo',
                         iconCls: 'tape-icon'
                     },
                     {
-                        text: 'Add numbers from x up to y',
+                        text: 'Add numbers from X up to Y',
                         id: 'programThree',
                         iconCls: 'tape-icon'
                     },
@@ -78,7 +78,7 @@ Ext.define('BDC.lib.ButtonsPanel', {
                         iconCls: 'tape-icon'
                     },
                     {
-                        text: 'Compute base-2 Logarithm of x',
+                        text: 'Compute base-2 Logarithm of X',
                         id: 'programFive',
                         iconCls: 'tape-icon'
                     },

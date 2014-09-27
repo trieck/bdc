@@ -81,7 +81,11 @@ Ext.define('BDC.store.Disassembly', {
                 instruction = Ext.String.format("SUB {0}", this.formatAddress(record));
                 break;
             case 7:
-                instruction = Ext.String.format("STORE {0}", this.formatAddress(record));
+                if (ir[0] === 0 && ir[1] === 0) {
+                    instruction = 'OUTPUT';
+                } else {
+                    instruction = Ext.String.format("STORE {0}", this.formatAddress(record));
+                }
                 break;
             case 8:
                 if (ir[0] === 0 && ir[1] === 0) {

@@ -60,6 +60,7 @@ Ext.define('BDC.controller.Controller', {
         machine.on('update', this.onUpdateMachine, this);
         machine.on('dataAccess', this.onDataAccess, this);
         machine.on('indirectAccess', this.onIndirectAccess, this);
+        machine.on('output', this.onOutput, this);
     },
 
     onUpdateMemory: function (store, record, op) {
@@ -80,6 +81,10 @@ Ext.define('BDC.controller.Controller', {
 
     onIndirectAccess: function (address) {
         this.getBDCView().indirectAccess(address);
+    },
+
+    onOutput: function (cell, value) {
+        this.getBDCView().output(cell, value);
     },
 
     onAssembler: function () {

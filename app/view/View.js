@@ -34,17 +34,25 @@ Ext.define('BDC.view.View', {
         return Ext.ComponentQuery.query('#flagsPanel')[0];
     },
 
+    outputPanel: function() {
+        return Ext.ComponentQuery.query('#outputPanel')[0];
+    },
+
     reset: function () {
         var panel = this.getComponent('memoryPanel');
         panel.clear();
 
         panel = this.registersPanel();
         panel.clear();
-        panel = this.haltPanel();
-        panel.clearHalt();
 
         panel = this.flagsPanel();
         panel.setOverflow(false);
+
+        panel = this.haltPanel();
+        panel.clearHalt();
+
+        panel = this.outputPanel();
+        panel.clear();
     },
 
     setStep: function () {
@@ -115,5 +123,11 @@ Ext.define('BDC.view.View', {
 
     indirectAccess: function (address) {
         this.highlightData(address, BDC.lib.Colors.GREEN);
+    },
+
+    output: function(cell, value) {
+        debugger;
+        panel = this.outputPanel();
+        panel.set(cell, value);
     }
 });

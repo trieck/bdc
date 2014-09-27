@@ -5,6 +5,7 @@ Ext.define('BDC.lib.RegistersPanel', {
     title: 'CPU Registers',
     layout: 'vbox',
     bodyPadding: 10,
+    width: 100,
     items: [
         {
             xtype: 'textfield',
@@ -12,7 +13,7 @@ Ext.define('BDC.lib.RegistersPanel', {
             fieldLabel: 'A:',
             fieldCls: 'memory-cell',
             labelCls: 'register-label',
-            labelWidth: 20,
+            labelWidth: 30,
             minLength: 1,
             maxLength: 2,
             selectOnFocus: true,
@@ -43,7 +44,7 @@ Ext.define('BDC.lib.RegistersPanel', {
                     }
                 }
             },
-            width: 75
+            width: 65
         },
         {
             xtype: 'textfield',
@@ -51,7 +52,7 @@ Ext.define('BDC.lib.RegistersPanel', {
             fieldLabel: 'PC:',
             fieldCls: 'memory-cell',
             labelCls: 'register-label',
-            labelWidth: 20,
+            labelWidth: 30,
             minLength: 1,
             maxLength: 2,
             selectOnFocus: true,
@@ -82,7 +83,7 @@ Ext.define('BDC.lib.RegistersPanel', {
                     }
                 }
             },
-            width: 75
+            width: 65
         },
         {
             xtype: 'textfield',
@@ -90,7 +91,7 @@ Ext.define('BDC.lib.RegistersPanel', {
             fieldLabel: 'IR:',
             fieldCls: 'memory-cell',
             labelCls: 'register-label',
-            labelWidth: 20,
+            labelWidth: 30,
             minLength: 1,
             maxLength: 3,
             selectOnFocus: true,
@@ -121,7 +122,7 @@ Ext.define('BDC.lib.RegistersPanel', {
                     }
                 }
             },
-            width: 75
+            width: 65
         }
     ],
 

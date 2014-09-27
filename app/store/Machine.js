@@ -181,6 +181,17 @@ Ext.define('BDC.store.Machine', {
     },
 
     /**
+     * Output value in accumulator
+     * at cell stored in pseudo-register Q
+     * @private
+     */
+    output: function () {
+        var memory = Ext.getStore('Memory');
+        var q = memory.getCellValue(80);  // Q pseudo-register
+        this.fireEvent('output', q, this.getACC());
+    },
+
+    /**
      * Step the machine
      * @public
      */
@@ -260,6 +271,8 @@ Ext.define('BDC.store.Machine', {
             case 7: // store accumulator
                 if (address !== 0) {
                     memory.setWord(address_, acc);
+                } else {
+                    this.output();
                 }
                 break;
             case 8: // increment memory value

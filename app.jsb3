@@ -50,6 +50,11 @@
                     "path": "app/lib/"
                 },
                 {
+                    "clsName": "BDC.lib.OutputDigit",
+                    "name": "OutputDigit.js",
+                    "path": "app/lib/"
+                },
+                {
                     "clsName": "BDC.store.Machine",
                     "name": "Machine.js",
                     "path": "app/store/"
@@ -62,6 +67,11 @@
                 {
                     "clsName": "BDC.lib.RegistersPanel",
                     "name": "RegistersPanel.js",
+                    "path": "app/lib/"
+                },
+                {
+                    "clsName": "BDC.lib.OutputPanel",
+                    "name": "OutputPanel.js",
                     "path": "app/lib/"
                 },
                 {

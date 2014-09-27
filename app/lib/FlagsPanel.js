@@ -5,6 +5,7 @@ Ext.define('BDC.lib.FlagsPanel', {
     layout: 'vbox',
     bodyPadding: 10,
     padding: '10 0 0 0',
+    width: 100,
     items: [
         {
             itemId: 'overflow-flag',

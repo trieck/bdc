@@ -84,7 +84,11 @@ Ext.define('BDC.store.Disassembly', {
                 instruction = Ext.String.format("SUB {0}", this.formatAddress(record));
                 break;
             case 7:
-                instruction = Ext.String.format("STORE {0}", this.formatAddress(record));
+                if (ir[0] === 0 && ir[1] === 0) {
+                    instruction = 'OUTPUT';
+                } else {
+                    instruction = Ext.String.format("STORE {0}", this.formatAddress(record));
+                }
                 break;
             case 8:
                 if (ir[0] === 0 && ir[1] === 0) {
@@ -204,17 +208,17 @@ Ext.define('BDC.lib.ButtonsPanel', {
             menu: {
                 items: [
                     {
-                        text: 'Multiply x and y',
+                        text: 'Multiply X and Y',
                         id: 'programOne',
                         iconCls: 'tape-icon'
                     },
                     {
-                        text: 'Divide x by y',
+                        text: 'Divide X by Y',
                         id: 'programTwo',
                         iconCls: 'tape-icon'
                     },
                     {
-                        text: 'Add numbers from x up to y',
+                        text: 'Add numbers from X up to Y',
                         id: 'programThree',
                         iconCls: 'tape-icon'
                     },
@@ -224,7 +228,7 @@ Ext.define('BDC.lib.ButtonsPanel', {
                         iconCls: 'tape-icon'
                     },
                     {
-                        text: 'Compute base-2 Logarithm of x',
+                        text: 'Compute base-2 Logarithm of X',
                         id: 'programFive',
                         iconCls: 'tape-icon'
                     },
@@ -461,6 +465,7 @@ Ext.define('BDC.lib.FlagsPanel', {
     layout: 'vbox',
     bodyPadding: 10,
     padding: '10 0 0 0',
+    width: 100,
     items: [
         {
             itemId: 'overflow-flag',
@@ -536,6 +541,86 @@ Ext.define('BDC.lib.DigitValidator', function () {
     return this;
 }());
 
+
+/**
+ * Digit class that supports
+ * decimal digits and a select
+ * set of alpha characters
+ */
+Ext.define('BDC.lib.OutputDigit', {
+    extend: 'Ext.container.Container',
+    alias: 'widget.output-digit',
+    statics: {
+        // each entry in the character set table is a binary string
+        // of the form 'TOP TOP-RIGHT BOTTOM-RIGHT BOTTOM BOTTOM-LEFT TOP-LEFT MIDDLE'
+        CHAR_SET: [
+            '1111110',  /* 0 */
+            '0110000',  /* 1 */
+            '1101101',  /* 2 */
+            '1111001',  /* 3 */
+            '0110011',  /* 4 */
+            '1011011',  /* 5 */
+            '0011111',  /* 6 */
+            '1110000',  /* 7 */
+            '1111111',  /* 8 */
+            '1111011',  /* 9 */
+            '1110111',  /* A */
+            '1001110',  /* C */
+            '1001111',  /* E */
+            '1000111',  /* F */
+            '1011110',  /* G */
+            '0110111',  /* H */
+            '1111000',  /* J */
+            '0001110',  /* L */
+            '1110110',  /* N */
+            '1100111',  /* P */
+            '0111110',  /* U */
+            '0000000'  /* {clear} */
+        ]
+    },
+    width: 10,
+    height: 14,
+    padding: 1,
+    componentCls: 'output-digit',
+    items: [
+        { xtype: 'component', componentCls: 'digit-section digit-middle', itemId: 'section-0' },
+        { xtype: 'component', componentCls: 'digit-section digit-top-left', itemId: 'section-1' },
+        { xtype: 'component', componentCls: 'digit-section digit-bottom-left', itemId: 'section-2' },
+        { xtype: 'component', componentCls: 'digit-section digit-bottom', itemId: 'section-3' },
+        { xtype: 'component', componentCls: 'digit-section digit-bottom-right', itemId: 'section-4' },
+        { xtype: 'component', componentCls: 'digit-section digit-top-right', itemId: 'section-5' },
+        { xtype: 'component', componentCls: 'digit-section digit-top', itemId: 'section-6' }
+    ],
+
+    clear: function() {
+        var sections = this.query('component[itemId^=section-]');
+        Ext.each(sections, function (section) {
+            section.setVisible(false);
+        });
+    },
+
+    /**
+     * Set digit value
+     * @param value
+     * @public
+     */
+    set: function (value) {
+        var i, n, entry, section;
+
+        value = value % this.self.CHAR_SET.length;
+        entry = this.self.CHAR_SET[value];
+        n = parseInt(entry, 2);
+
+        for (i = 0; i < 7; ++i) {
+            section = this.getComponent('section-' + i);
+            if (n & (1 << i)) {
+                section.setVisible(true);
+            } else {
+                section.setVisible(false);
+            }
+        }
+    }
+});
 
 /**
  * Store to represent machine
@@ -720,6 +805,17 @@ Ext.define('BDC.store.Machine', {
     },
 
     /**
+     * Output value in accumulator
+     * at cell stored in pseudo-register Q
+     * @private
+     */
+    output: function () {
+        var memory = Ext.getStore('Memory');
+        var q = memory.getCellValue(80);  // Q pseudo-register
+        this.fireEvent('output', q, this.getACC());
+    },
+
+    /**
      * Step the machine
      * @public
      */
@@ -799,6 +895,8 @@ Ext.define('BDC.store.Machine', {
             case 7: // store accumulator
                 if (address !== 0) {
                     memory.setWord(address_, acc);
+                } else {
+                    this.output();
                 }
                 break;
             case 8: // increment memory value
@@ -912,6 +1010,7 @@ Ext.define('BDC.lib.RegistersPanel', {
     title: 'CPU Registers',
     layout: 'vbox',
     bodyPadding: 10,
+    width: 100,
     items: [
         {
             xtype: 'textfield',
@@ -919,7 +1018,7 @@ Ext.define('BDC.lib.RegistersPanel', {
             fieldLabel: 'A:',
             fieldCls: 'memory-cell',
             labelCls: 'register-label',
-            labelWidth: 20,
+            labelWidth: 30,
             minLength: 1,
             maxLength: 2,
             selectOnFocus: true,
@@ -950,7 +1049,7 @@ Ext.define('BDC.lib.RegistersPanel', {
                     }
                 }
             },
-            width: 75
+            width: 65
         },
         {
             xtype: 'textfield',
@@ -958,7 +1057,7 @@ Ext.define('BDC.lib.RegistersPanel', {
             fieldLabel: 'PC:',
             fieldCls: 'memory-cell',
             labelCls: 'register-label',
-            labelWidth: 20,
+            labelWidth: 30,
             minLength: 1,
             maxLength: 2,
             selectOnFocus: true,
@@ -989,7 +1088,7 @@ Ext.define('BDC.lib.RegistersPanel', {
                     }
                 }
             },
-            width: 75
+            width: 65
         },
         {
             xtype: 'textfield',
@@ -997,7 +1096,7 @@ Ext.define('BDC.lib.RegistersPanel', {
             fieldLabel: 'IR:',
             fieldCls: 'memory-cell',
             labelCls: 'register-label',
-            labelWidth: 20,
+            labelWidth: 30,
             minLength: 1,
             maxLength: 3,
             selectOnFocus: true,
@@ -1028,7 +1127,7 @@ Ext.define('BDC.lib.RegistersPanel', {
                     }
                 }
             },
-            width: 75
+            width: 65
         }
     ],
 
@@ -1068,13 +1167,66 @@ Ext.define('BDC.lib.RegistersPanel', {
     }
 });
 
+Ext.define('BDC.lib.OutputPanel', {
+    extend: 'Ext.panel.Panel',
+    alias: 'widget.output-panel',
+    requires: 'BDC.lib.OutputDigit',
+    title: 'Output',
+    bodyPadding: '5 0 0 5',
+    padding: '10 0 0 0',
+    width: 100,
+    height: 60,
+    border: true,
+    bodyCls: 'output-panel',
+    layout: 'hbox',
+    items: [
+        { xtype: 'output-digit', itemId: 'digit-0' },
+        { xtype: 'output-digit', itemId: 'digit-1' },
+        { xtype: 'output-digit', itemId: 'digit-2' },
+        { xtype: 'output-digit', itemId: 'digit-3' },
+        { xtype: 'output-digit', itemId: 'digit-4' },
+        { xtype: 'output-digit', itemId: 'digit-5' },
+        { xtype: 'output-digit', itemId: 'digit-6' },
+        { xtype: 'output-digit', itemId: 'digit-7' },
+        { xtype: 'output-digit', itemId: 'digit-8' }
+    ],
+
+    /**
+     * Clear output panel
+     * @public
+     */
+    clear: function () {
+        var digits = this.query('output-digit[itemId^=digit-]');
+        Ext.each(digits, function (digit) {
+            digit.clear();
+        });
+    },
+
+    /**
+     * Set digit value
+     * @param cell
+     * @param value
+     * @public
+     */
+    set: function (cell, value) {
+        var digit;
+
+        cell = cell % 9;
+        digit = this.getComponent('digit-' + cell);
+        if (digit) {
+            digit.set(value);
+        }
+    }
+});
+
 Ext.define('BDC.lib.StatusPanel', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.status-panel',
     requires: [
         'BDC.lib.RegistersPanel',
         'BDC.lib.FlagsPanel',
-        'BDC.lib.HaltPanel'
+        'BDC.lib.HaltPanel',
+        'BDC.lib.OutputPanel'
     ],
     width: 130,
     layout: {
@@ -1091,6 +1243,10 @@ Ext.define('BDC.lib.StatusPanel', {
         {
             xtype: 'flags-panel',
             itemId: 'flagsPanel'
+        },
+        {
+            xtype: 'output-panel',
+            itemId: 'outputPanel'
         },
         {
             xtype: 'halt-panel',
@@ -1135,17 +1291,25 @@ Ext.define('BDC.view.View', {
         return Ext.ComponentQuery.query('#flagsPanel')[0];
     },
 
+    outputPanel: function() {
+        return Ext.ComponentQuery.query('#outputPanel')[0];
+    },
+
     reset: function () {
         var panel = this.getComponent('memoryPanel');
         panel.clear();
 
         panel = this.registersPanel();
         panel.clear();
-        panel = this.haltPanel();
-        panel.clearHalt();
 
         panel = this.flagsPanel();
         panel.setOverflow(false);
+
+        panel = this.haltPanel();
+        panel.clearHalt();
+
+        panel = this.outputPanel();
+        panel.clear();
     },
 
     setStep: function () {
@@ -1216,6 +1380,12 @@ Ext.define('BDC.view.View', {
 
     indirectAccess: function (address) {
         this.highlightData(address, BDC.lib.Colors.GREEN);
+    },
+
+    output: function(cell, value) {
+        debugger;
+        panel = this.outputPanel();
+        panel.set(cell, value);
     }
 });
 
@@ -1281,6 +1451,7 @@ Ext.define('BDC.controller.Controller', {
         machine.on('update', this.onUpdateMachine, this);
         machine.on('dataAccess', this.onDataAccess, this);
         machine.on('indirectAccess', this.onIndirectAccess, this);
+        machine.on('output', this.onOutput, this);
     },
 
     onUpdateMemory: function (store, record, op) {
@@ -1301,6 +1472,10 @@ Ext.define('BDC.controller.Controller', {
 
     onIndirectAccess: function (address) {
         this.getBDCView().indirectAccess(address);
+    },
+
+    onOutput: function (cell, value) {
+        this.getBDCView().output(cell, value);
     },
 
     onAssembler: function () {
@@ -1470,6 +1645,7 @@ Ext.define('BDC.lib.Assembler', {
             add: 5,     // add value in memory to .A
             sub: 6,     // subtract value in memory from .A
             store: 7,   // copy .A to memory
+            output: -2, // output value in .A
             inc: 8,     // increment value at memory address
             dec: 9      // decrement value at memory address
         },
@@ -1703,6 +1879,9 @@ Ext.define('BDC.lib.Assembler', {
             case this.self.MNEMONICS.store: // store accumulator to memory
                 this.store();
                 break;
+            case this.self.MNEMONICS.output: // output value in accumulator
+                this.output();
+                break;
             case this.self.MNEMONICS.inc:   // increment value in memory
                 this.inc();
                 break;
@@ -1789,6 +1968,15 @@ Ext.define('BDC.lib.Assembler', {
     store: function () {
         var value = this.getMemory();
         this.assemble_val(value);
+        this.memory[this.o_index++] = this.self.MNEMONICS.store;
+    },
+
+    /**
+     * Output value in accumulator
+     * @private
+     */
+    output: function () {
+        this.assemble_val(0);
         this.memory[this.o_index++] = this.self.MNEMONICS.store;
     },
 
@@ -2044,6 +2232,7 @@ Ext.define('BDC.lib.AssemblerEditor', {
     title: 'BDC Assembler',
     renderTo: 'bdc-assembler',
     iconCls: 'assemble-icon',
+    autoShow: true,
     closable: true,
     width: 600,
     height: 375,
@@ -2124,6 +2313,7 @@ Ext.define('BDC.lib.Disassembler', {
     title: 'BDC Disassembler',
     renderTo: 'bdc-disassembler',
     iconCls: 'disassemble-icon',
+    autoShow: true,
     closable: true,
     width: 320,
     height: 400,

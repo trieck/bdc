@@ -4,6 +4,7 @@ Ext.define('BDC.lib.Disassembler', {
     title: 'BDC Disassembler',
     renderTo: 'bdc-disassembler',
     iconCls: 'disassemble-icon',
+    autoShow: true,
     closable: true,
     width: 320,
     height: 400,

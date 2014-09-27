@@ -4,7 +4,8 @@ Ext.define('BDC.lib.StatusPanel', {
     requires: [
         'BDC.lib.RegistersPanel',
         'BDC.lib.FlagsPanel',
-        'BDC.lib.HaltPanel'
+        'BDC.lib.HaltPanel',
+        'BDC.lib.OutputPanel'
     ],
     width: 130,
     layout: {
@@ -21,6 +22,10 @@ Ext.define('BDC.lib.StatusPanel', {
         {
             xtype: 'flags-panel',
             itemId: 'flagsPanel'
+        },
+        {
+            xtype: 'output-panel',
+            itemId: 'outputPanel'
         },
         {
             xtype: 'halt-panel',

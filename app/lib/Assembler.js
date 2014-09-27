@@ -15,6 +15,7 @@ Ext.define('BDC.lib.Assembler', {
             add: 5,     // add value in memory to .A
             sub: 6,     // subtract value in memory from .A
             store: 7,   // copy .A to memory
+            output: -2, // output value in .A
             inc: 8,     // increment value at memory address
             dec: 9      // decrement value at memory address
         },
@@ -248,6 +249,9 @@ Ext.define('BDC.lib.Assembler', {
             case this.self.MNEMONICS.store: // store accumulator to memory
                 this.store();
                 break;
+            case this.self.MNEMONICS.output: // output value in accumulator
+                this.output();
+                break;
             case this.self.MNEMONICS.inc:   // increment value in memory
                 this.inc();
                 break;
@@ -334,6 +338,15 @@ Ext.define('BDC.lib.Assembler', {
     store: function () {
         var value = this.getMemory();
         this.assemble_val(value);
+        this.memory[this.o_index++] = this.self.MNEMONICS.store;
+    },
+
+    /**
+     * Output value in accumulator
+     * @private
+     */
+    output: function () {
+        this.assemble_val(0);
         this.memory[this.o_index++] = this.self.MNEMONICS.store;
     },
 
