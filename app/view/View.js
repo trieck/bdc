@@ -34,7 +34,7 @@ Ext.define('BDC.view.View', {
         return Ext.ComponentQuery.query('#flagsPanel')[0];
     },
 
-    outputPanel: function() {
+    outputPanel: function () {
         return Ext.ComponentQuery.query('#outputPanel')[0];
     },
 
@@ -125,9 +125,8 @@ Ext.define('BDC.view.View', {
         this.highlightData(address, BDC.lib.Colors.GREEN);
     },
 
-    output: function(cell, value) {
-        debugger;
-        panel = this.outputPanel();
+    output: function (cell, value) {
+        var panel = this.outputPanel();
         panel.set(cell, value);
     }
 });
