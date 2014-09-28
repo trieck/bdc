@@ -181,22 +181,6 @@ Ext.define('BDC.lib.ButtonsPanel', {
         },
         {
             xtype: 'button',
-            tooltip: { text: 'Save the machine state' },
-            text: 'SAVE',
-            disabled: true,
-            focusCls: '',
-            id: 'saveButton',
-            iconCls: 'save-icon',
-            iconAlign: 'top',
-            width: '80%',
-            flex: 0.6
-        },
-        {
-            border: false,
-            flex: 0.10
-        },
-        {
-            xtype: 'button',
             tooltip: { text: 'Load program to the machine' },
             text: 'LOAD',
             focusCls: '',
@@ -239,6 +223,22 @@ Ext.define('BDC.lib.ButtonsPanel', {
                     }
                 ]
             }
+        },
+        {
+            border: false,
+            flex: 0.10
+        },
+        {
+            xtype: 'button',
+            tooltip: { text: 'Save the machine state' },
+            text: 'SAVE',
+            disabled: true,
+            focusCls: '',
+            id: 'saveButton',
+            iconCls: 'save-icon',
+            iconAlign: 'top',
+            width: '80%',
+            flex: 0.6
         },
         {
             border: false,
