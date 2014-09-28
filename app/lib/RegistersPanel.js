@@ -129,12 +129,15 @@ Ext.define('BDC.lib.RegistersPanel', {
     clear: function () {
         var component = this.getComponent('ACC');
         component.reset();
+        component.setValue('00');
 
         component = this.getComponent('PC');
         component.reset();
+        component.setValue('00');
 
         component = this.getComponent('IR');
         component.reset();
+        component.setValue('000');
     },
 
     setACC: function (n) {

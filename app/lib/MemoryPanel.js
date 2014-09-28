@@ -77,7 +77,7 @@ Ext.define('BDC.lib.MemoryPanel', {
         var cells = this.getMemoryCells();
         Ext.each(cells, function (cell) {
             cell.reset();
-            cell.setFieldStyle('color: darkgrey;');
+            cell.setFieldStyle('color: dimgrey;');
             cell.setValue('0');
         });
         this.highlightInstruction(0, BDC.lib.Colors.MAGENTA);
@@ -118,7 +118,7 @@ Ext.define('BDC.lib.MemoryPanel', {
     resetGray: function () {
         var cells = this.getMemoryCells();
         Ext.each(cells, function (cell) {
-            cell.setFieldStyle('color: darkgrey;');
+            cell.setFieldStyle('color: dimgrey;');
         });
     },
 

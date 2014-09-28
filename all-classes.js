@@ -371,7 +371,7 @@ Ext.define('BDC.lib.MemoryPanel', {
         var cells = this.getMemoryCells();
         Ext.each(cells, function (cell) {
             cell.reset();
-            cell.setFieldStyle('color: darkgrey;');
+            cell.setFieldStyle('color: dimgrey;');
             cell.setValue('0');
         });
         this.highlightInstruction(0, BDC.lib.Colors.MAGENTA);
@@ -412,7 +412,7 @@ Ext.define('BDC.lib.MemoryPanel', {
     resetGray: function () {
         var cells = this.getMemoryCells();
         Ext.each(cells, function (cell) {
-            cell.setFieldStyle('color: darkgrey;');
+            cell.setFieldStyle('color: dimgrey;');
         });
     },
 
@@ -1134,12 +1134,15 @@ Ext.define('BDC.lib.RegistersPanel', {
     clear: function () {
         var component = this.getComponent('ACC');
         component.reset();
+        component.setValue('00');
 
         component = this.getComponent('PC');
         component.reset();
+        component.setValue('00');
 
         component = this.getComponent('IR');
         component.reset();
+        component.setValue('000');
     },
 
     setACC: function (n) {

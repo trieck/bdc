@@ -1,3 +1,4 @@
+
 body {
     font-family: serif;
     font-size: 80%;
@@ -44,8 +45,7 @@ body {
 
 .memory-cell {
     border: none;
-    color: darkgrey;
-    font-family: "Menlo", "Courier New", "Courier", monospace;
+    color: dimgrey;
     text-align: center;
 }
 
@@ -133,7 +133,7 @@ body {
 }
 
 .register-label {
-    color: #4c3000;
+    color: dimgrey;
     display: inline-block;
     font-family: "Menlo", "Courier New", "Courier", monospace;
     font-size: 12px;
@@ -177,4 +177,3 @@ body {
 .x-field-label-cell {
     vertical-align: middle;
 }
-
