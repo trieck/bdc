@@ -12,6 +12,10 @@ body {
     background-image: url(../images/assemble.png) !important;
 }
 
+.can-icon {
+    background-image: url(../images/can.png) !important;
+}
+
 .cpu-icon {
     background-image: url(../images/cpu.png) !important;
 }

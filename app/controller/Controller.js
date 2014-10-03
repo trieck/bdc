@@ -135,10 +135,11 @@ Ext.define('BDC.controller.Controller', {
 	onSave: function () {
 		var machine, memory;
 		var state = {};
-		var json, i;
+		var i;
 
 		Ext.MessageBox.prompt('Save machine state', 'Please enter a filename:', function (buttonId, filename) {
-			filename = filename.trim();
+			filename = filename.replace(/[^a-z0-9]/gi, '');
+
 			if (buttonId === 'ok' && filename.length > 0) {
 				machine = this.getMachineStore();
 				memory = this.getMemoryStore();
@@ -161,9 +162,8 @@ Ext.define('BDC.controller.Controller', {
 					success: function () {
 						Ext.Msg.alert('Success', 'Machine saved successfully.');
 					},
-					failure: function (response) {
-						json = Ext.JSON.decode(response.responseText);
-						Ext.Msg.alert('Save Error', json.result);
+					failure: function () {
+						Ext.Msg.alert('Save Error', 'Unable to save machine.');
 					}
 				});
 			}
