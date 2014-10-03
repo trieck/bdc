@@ -82,7 +82,6 @@ Ext.define('BDC.lib.ButtonsPanel', {
             xtype: 'button',
             tooltip: { text: 'Save the machine state' },
             text: 'SAVE',
-            disabled: true,
             focusCls: '',
             id: 'saveButton',
             iconCls: 'save-icon',
