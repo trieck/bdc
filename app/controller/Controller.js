@@ -106,7 +106,7 @@ Ext.define('BDC.controller.Controller', {
 			memory = editor.assemble();
 		} catch (e) {
 			message = Ext.String.format("Error: {0}, Line: {1}", e.error, e.line_no);
-			Ext.Msg.alert(message);
+			Ext.Msg.alert('Error', message);
 			return;
 		}
 
@@ -135,7 +135,7 @@ Ext.define('BDC.controller.Controller', {
 	onSave: function () {
 		var machine, memory;
 		var state = {};
-		var i;
+		var json, i;
 
 		Ext.MessageBox.prompt('Save machine state', 'Please enter a filename:', function (buttonId, filename) {
 			filename = filename.trim();
@@ -158,7 +158,12 @@ Ext.define('BDC.controller.Controller', {
 					url: window.location.origin + '/save.rb?',
 					method: 'POST',
 					params: { machine: Ext.JSON.encode(state) },
-					success: function (response) {
+					success: function () {
+						Ext.Msg.alert('Success', 'Machine saved successfully.');
+					},
+					failure: function (response) {
+						json = Ext.JSON.decode(response.responseText);
+						Ext.Msg.alert('Save Error', json.result);
 					}
 				});
 			}
