@@ -79,6 +79,11 @@ Ext.define('BDC.lib.ButtonsPanel', {
 								}
 							]
 						}
+					},
+					{
+						text: 'From Database...',
+						iconCls: 'database-icon',
+						id: 'loadMachineButton'
 					}
 				]
 			}

@@ -20,6 +20,10 @@ body {
     background-image: url(../images/cpu.png) !important;
 }
 
+.database-icon {
+    background-image: url(../images/database.png) !important;
+}
+
 .disassemble-icon {
     background-image: url(../images/disassemble.png) !important;
 }

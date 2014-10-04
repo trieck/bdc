@@ -131,7 +131,6 @@ Ext.define('BDC.store.Disassembly', {
      * @returns {String}
      * @private
      */
-
     formatAddress: function (record) {
         var ir = record.get('ir');
         var address = ir[1] * 10 + ir[0];

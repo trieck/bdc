@@ -1,7 +1,7 @@
 Ext.define('BDC.controller.Controller', {
 	extend: 'Ext.app.Controller',
-	uses: ['BDC.lib.Programs', 'BDC.lib.AssemblerEditor', 'BDC.lib.Disassembler'],
-	stores: [ 'Machine', 'Memory', 'Disassembly' ],
+	uses: ['BDC.lib.Programs', 'BDC.lib.AssemblerEditor', 'BDC.lib.Disassembler', 'BDC.lib.MachineLoadDialog'],
+	stores: [ 'Machine', 'Memory', 'Disassembly', 'MachineList' ],
 	views: [ 'BDC.view.View' ],
 	refs: [
 		{ selector: 'bdc-view', ref: 'BDCView' },
@@ -27,6 +27,9 @@ Ext.define('BDC.controller.Controller', {
 			},
 			'#stepButton': {
 				click: this.onStep
+			},
+			'#loadMachineButton': {
+				click: this.onLoadMachine
 			},
 			'#saveButton': {
 				click: this.onSave
@@ -132,19 +135,23 @@ Ext.define('BDC.controller.Controller', {
 		machine.step();
 	},
 
+	onLoadMachine: function () {
+		var dialog = new BDC.lib.MachineLoadDialog();
+	},
+
 	onSave: function () {
 		var machine, memory;
 		var state = {};
-		var i;
+		var result, i;
 
-		Ext.MessageBox.prompt('Save machine state', 'Please enter a filename:', function (buttonId, filename) {
-			filename = filename.replace(/[^a-z0-9]/gi, '');
+		Ext.MessageBox.prompt('Save Machine State', 'Please enter a name:', function (buttonId, name) {
+			name = name.trim();
 
-			if (buttonId === 'ok' && filename.length > 0) {
+			if (buttonId === 'ok' && name.length > 0) {
 				machine = this.getMachineStore();
 				memory = this.getMemoryStore();
 
-				state.filename = filename;
+				state.name = name;
 				state.halted = machine.getHalted();
 				state.overflow_flag = machine.getOverflow();
 				state.reg_a = machine.getACC();
@@ -162,8 +169,9 @@ Ext.define('BDC.controller.Controller', {
 					success: function () {
 						Ext.Msg.alert('Success', 'Machine saved successfully.');
 					},
-					failure: function () {
-						Ext.Msg.alert('Save Error', 'Unable to save machine.');
+					failure: function (response) {
+						result = Ext.JSON.decode(response.responseText);
+						Ext.Msg.alert('Save Error', result.result);
 					}
 				});
 			}

@@ -1,39 +1,29 @@
 #!/Ruby21-x64/bin/ruby
 
 require 'cgi'
-require 'kirbybase'
+require 'mysql'
 require 'json'
 
-MACHINES_PATH = './machines'
-
-cgi = CGI::new()
+cgi = CGI::new
 status = 'OK'
 
 begin
-  # create a new database instance
-  # specifying memo_blob_path
-  db = KirbyBase.new(:local, nil, nil, './', '.tbl', MACHINES_PATH)
+  conn = Mysql::new '127.0.0.1', 'mqrieckc_bdc', '3rsk!n31', 'mqrieckc_bdc'
 
-  # create or get table
-  if db.table_exists?(:machines)
-    tbl = db.get_table(:machines)
-  else
-    Dir.mkdir(MACHINES_PATH) unless File.directory?(MACHINES_PATH)
-    tbl = db.create_table(:machines, :state, :Blob)
-  end
+  machine = cgi['machine']
+  parsed = JSON.parse(machine)
+  name = parsed['name']
 
-  machine = JSON.parse(cgi['machine'])
-  filename = machine['filename']
-
-  blob = KBBlob.new(db, filename, machine)
-  tbl.insert(blob)
+  statement = "INSERT INTO machines (name, data, created_at, updated_at) VALUES ('#{name}', '#{machine}', NOW(), NOW());"
+  conn.query(statement)
 
   result = JSON.generate({result: true})
 
-rescue => e
+rescue Mysql::Error => e
   result = JSON.generate({result: "#{e}"})
   status = 'SERVER_ERROR'
 ensure
+  conn.close
   cgi.out(
       'type' => 'application/json',
       'status' => status
