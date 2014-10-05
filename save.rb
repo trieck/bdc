@@ -1,4 +1,4 @@
-#!/Ruby21-x64/bin/ruby
+#!/usr/bin/ruby
 
 require 'cgi'
 require 'mysql'
@@ -25,7 +25,7 @@ rescue Mysql::Error => e
   result = JSON.generate({result: "#{e}"})
   status = 'SERVER_ERROR'
 ensure
-  conn.close
+  conn.close unless conn.nil?
   cgi.out(
       'type' => 'application/json',
       'status' => status
