@@ -1,0 +1,9 @@
+GEM
+  specs:
+    ruby-mysql (2.9.12)
+
+PLATFORMS
+  x64-mingw32
+
+DEPENDENCIES
+  ruby-mysql
