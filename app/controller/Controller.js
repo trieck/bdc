@@ -206,7 +206,7 @@ Ext.define('BDC.controller.Controller', {
 				}
 
 				Ext.Ajax.request({
-					url: window.location.origin + '/cgi-bin/save.rb?',
+					url: './cgi-bin/save.rb?',
 					method: 'POST',
 					params: { machine: Ext.JSON.encode(state) },
 					success: function () {
@@ -258,7 +258,7 @@ Ext.define('BDC.controller.Controller', {
 		memoryStore = this.getMemoryStore();
 
 		Ext.Ajax.request({
-			url: window.location.origin + '/cgi-bin/load.rb?',
+			url: './cgi-bin/load.rb?',
 			method: 'GET',
 			params: { name: model.get('name') },
 			success: function (response) {
@@ -285,7 +285,7 @@ Ext.define('BDC.controller.Controller', {
 		var result, store = Ext.getStore('MachineList');
 
 		Ext.Ajax.request({
-			url: window.location.origin + '/cgi-bin/delete.rb?',
+			url: './cgi-bin/delete.rb?',
 			method: 'DELETE',
 			params: { name: model.get('name') },
 			success: function () {
