@@ -4,6 +4,7 @@
 Ext.define('BDC.lib.MachineLoadDialog', {
 	extend: 'Ext.window.Window',
 	iconCls: 'database-icon',
+	id: 'loadDialog',
 	modal: true,
 	autoShow: true,
 	width: 400,
@@ -43,13 +44,36 @@ Ext.define('BDC.lib.MachineLoadDialog', {
 			listeners: {
 				selectionchange: {
 					fn: function (model, selected) {
-						model.view.up().up().down('button[itemId=okButton]').setDisabled(!selected.length);
+						Ext.ComponentQuery.query('button[itemId=okButton]')[0].setDisabled(!selected.length);
 					},
 					scope: this
+				},
+				itemcontextmenu: function (view, record, item, index, event) {
+					var menu = view.up().up().down('.menu');
+					var position = event.getXY();
+					event.stopEvent();
+					menu.showAt(position);
 				}
 			}
+		},
+		{
+			xtype: 'menu',
+			items: [
+				{
+					text: 'Delete Machine',
+					iconCls: 'delete-icon',
+					handler: function () {
+						var model, grid = Ext.ComponentQuery.query('#machinesPanel')[0];
+						if (grid.getSelectionModel().hasSelection()) {
+							model = grid.getSelectionModel().getSelection()[0];
+							grid.fireEvent('deleteMachine', model);
+						}
+					}
+				}
+			]
 		}
-	], buttons: [
+	],
+	buttons: [
 		{
 			xtype: 'button',
 			text: 'OK',
@@ -57,7 +81,7 @@ Ext.define('BDC.lib.MachineLoadDialog', {
 			itemId: 'okButton',
 			handler: function () {
 				var me = this, model, dlg, machine;
-				var grid = me.up().up().down('gridpanel');
+				var grid = Ext.ComponentQuery.query('#machinesPanel')[0];
 				if (grid.getSelectionModel().hasSelection()) {
 					model = grid.getSelectionModel().getSelection()[0];
 
@@ -68,7 +92,7 @@ Ext.define('BDC.lib.MachineLoadDialog', {
 						success: function (response) {
 							dlg = me.up('.window');
 							machine = Ext.JSON.decode(response.responseText);
-							dlg.controller.loadMachine(machine);
+							dlg.fireEvent('loadMachine', machine);
 							dlg.close();
 						},
 

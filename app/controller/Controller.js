@@ -57,6 +57,12 @@ Ext.define('BDC.controller.Controller', {
 			},
 			'#programSix': {
 				click: this.onProgramSix
+			},
+			'#loadDialog': {
+				loadMachine: this.loadMachine
+			},
+			'#machinesPanel': {
+				deleteMachine: this.deleteMachine
 			}
 		});
 	},
@@ -162,7 +168,7 @@ Ext.define('BDC.controller.Controller', {
 	},
 
 	onLoadMachine: function () {
-		new BDC.lib.MachineLoadDialog({controller: this});
+		Ext.create('BDC.lib.MachineLoadDialog');
 	},
 
 	onSaveText: function () {
@@ -260,5 +266,22 @@ Ext.define('BDC.controller.Controller', {
 		machineStore.setIR(machine.reg_ir);
 
 		memoryStore.loadProgram(machine.memory);
+	},
+
+	deleteMachine: function (model) {
+		var result, store = Ext.getStore('MachineList');
+
+		Ext.Ajax.request({
+			url: window.location.origin + '/cgi-bin/delete.rb?',
+			method: 'DELETE',
+			params: { name: model.get('name') },
+			success: function () {
+				store.reload();
+			},
+			failure: function (response) {
+				result = Ext.JSON.decode(response.responseText);
+				Ext.Msg.alert('Save Error', result.result);
+			}
+		});
 	}
 });

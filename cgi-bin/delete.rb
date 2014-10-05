@@ -10,14 +10,8 @@ status = 'OK'
 begin
   conn = Mysql::new '127.0.0.1', 'mqrieckc_bdc', '3rsk!n31', 'mqrieckc_bdc'
 
-  machine = cgi['machine']
-  parsed = JSON.parse(machine)
-
-  name = Mysql.escape_string(parsed['name'])
-  machine = Mysql.escape_string(machine)
-
-  statement = "INSERT INTO machines (name, data, created_at, updated_at) VALUES ('#{name}', '#{machine}', NOW(), NOW());"
-  conn.query(statement)
+  name = Mysql.escape_string(cgi['name'])
+  conn.query("delete from machines where name='#{name}';")
 
   result = {result: true}
 
@@ -31,5 +25,3 @@ ensure
       'status' => status
   ) { JSON.generate(result) }
 end
-
-
