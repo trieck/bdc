@@ -134,7 +134,6 @@ Ext.define('BDC.store.Disassembly', {
      * @returns {String}
      * @private
      */
-
     formatAddress: function (record) {
         var ir = record.get('ir');
         var address = ir[1] * 10 + ir[0];
@@ -148,148 +147,200 @@ Ext.define('BDC.store.Disassembly', {
 });
 
 
+/**
+ * Store to represent a list of machines
+ */
+Ext.define('BDC.store.MachineList', {
+	extend: 'Ext.data.Store',
+	autoLoad: false,
+	remoteSort: true,
+	fields: [
+		{name: 'name', type: 'string'},
+		{name: 'date', type: 'date'}
+	],
+
+	proxy: {
+		type: 'ajax',
+		url: './cgi-bin/list.rb',
+		reader: {
+			type: 'json',
+			root: 'machines'
+		}
+	}
+});
+
 Ext.define('BDC.lib.ButtonsPanel', {
-    extend: 'Ext.panel.Panel',
-    alias: 'widget.buttons-panel',
-    layout: {
-        type: 'vbox',
-        align: 'center'
-    },
-    width: 140,
-    height: 350,
-    title: 'Options',
-    padding: '10 10 10 15',
-    items: [
-        {
-            border: false,
-            flex: 0.2
-        },
-        {
-            xtype: 'button',
-            tooltip: { text: 'Step the machine' },
-            text: 'STEP',
-            focusCls: '',
-            id: 'stepButton',
-            iconCls: 'step-icon',
-            iconAlign: 'top',
-            width: '80%',
-            flex: 0.6
-        },
-        {
-            border: false,
-            flex: 0.2
-        },
-        {
-            xtype: 'button',
-            tooltip: { text: 'Load program to the machine' },
-            text: 'LOAD',
-            focusCls: '',
-            id: 'loadButton',
-            iconCls: 'load-icon',
-            iconAlign: 'top',
-            width: '80%',
-            flex: 0.6,
-            menu: {
-                items: [
-                    {
-                        text: 'Multiply X and Y',
-                        id: 'programOne',
-                        iconCls: 'tape-icon'
-                    },
-                    {
-                        text: 'Divide X by Y',
-                        id: 'programTwo',
-                        iconCls: 'tape-icon'
-                    },
-                    {
-                        text: 'Add numbers from X up to Y',
-                        id: 'programThree',
-                        iconCls: 'tape-icon'
-                    },
-                    {
-                        text: 'Generate Fibonacci numbers',
-                        id: 'programFour',
-                        iconCls: 'tape-icon'
-                    },
-                    {
-                        text: 'Compute base-2 Logarithm of X',
-                        id: 'programFive',
-                        iconCls: 'tape-icon'
-                    },
-                    {
-                        text: 'Add data in array',
-                        id: 'programSix',
-                        iconCls: 'tape-icon'
-                    }
-                ]
-            }
-        },
-        {
-            border: false,
-            flex: 0.10
-        },
-        {
-            xtype: 'button',
-            tooltip: { text: 'Save the machine state' },
-            text: 'SAVE',
-            disabled: true,
-            focusCls: '',
-            id: 'saveButton',
-            iconCls: 'save-icon',
-            iconAlign: 'top',
-            width: '80%',
-            flex: 0.6
-        },
-        {
-            border: false,
-            flex: 0.2
-        },
-        {
-            xtype: 'button',
-            tooltip: { text: 'Reset the machine' },
-            text: 'RESET',
-            focusCls: '',
-            id: 'resetButton',
-            iconCls: 'reset-icon',
-            iconAlign: 'top',
-            width: '80%',
-            flex: 0.6
-        },
-        {
-            border: false,
-            flex: 0.2
-        },
-        {
-            xtype: 'button',
-            tooltip: { text: 'Launch Assembler Editor' },
-            text: 'ASSEMBLER',
-            focusCls: '',
-            id: 'assemblerButton',
-            iconCls: 'assemble-icon',
-            iconAlign: 'top',
-            width: '80%',
-            flex: 0.6
-        },
-        {
-            border: false,
-            flex: 0.10
-        },
-        {
-            xtype: 'button',
-            tooltip: { text: 'Launch Disassembler' },
-            text: 'DISASSEMBLER',
-            focusCls: '',
-            id: 'disassemblerButton',
-            iconCls: 'disassemble-icon',
-            iconAlign: 'top',
-            width: '80%',
-            flex: 0.6
-        },
-        {
-            border: false,
-            flex: 0.2
-        }
-    ]
+	extend: 'Ext.panel.Panel',
+	alias: 'widget.buttons-panel',
+	layout: {
+		type: 'vbox',
+		align: 'center'
+	},
+	width: 140,
+	height: 350,
+	title: 'Options',
+	padding: '10 10 10 15',
+	items: [
+		{
+			border: false,
+			flex: 0.2
+		},
+		{
+			xtype: 'button',
+			tooltip: { text: 'Step the machine' },
+			text: 'STEP',
+			focusCls: '',
+			id: 'stepButton',
+			iconCls: 'step-icon',
+			iconAlign: 'top',
+			width: '80%',
+			flex: 0.6
+		},
+		{
+			border: false,
+			flex: 0.2
+		},
+		{
+			xtype: 'button',
+			tooltip: { text: 'Load Program/Machine' },
+			text: 'LOAD',
+			focusCls: '',
+			id: 'loadButton',
+			iconCls: 'load-icon',
+			iconAlign: 'top',
+			width: '80%',
+			flex: 0.6,
+			menu: {
+				items: [
+					{
+						text: 'Canned Programs',
+						iconCls: 'can-icon',
+						menu: {
+							plain: true,
+							items: [
+								{
+									text: 'Multiply X and Y',
+									id: 'programOne',
+									iconCls: 'tape-icon'
+								},
+								{
+									text: 'Divide X by Y',
+									id: 'programTwo',
+									iconCls: 'tape-icon'
+								},
+								{
+									text: 'Add numbers from X up to Y',
+									id: 'programThree',
+									iconCls: 'tape-icon'
+								},
+								{
+									text: 'Generate Fibonacci numbers',
+									id: 'programFour',
+									iconCls: 'tape-icon'
+								},
+								{
+									text: 'Compute base-2 Logarithm of X',
+									id: 'programFive',
+									iconCls: 'tape-icon'
+								},
+								{
+									text: 'Add data in array',
+									id: 'programSix',
+									iconCls: 'tape-icon'
+								}
+							]
+						}
+					},
+					{
+						text: 'Program from Text...',
+						iconCls: 'text-icon',
+						id: 'loadTextButton'
+					},
+					{
+						text: 'From Database...',
+						iconCls: 'database-icon',
+						id: 'loadMachineButton'
+					}
+				]
+			}
+		},
+		{
+			border: false,
+			flex: 0.10
+		},
+		{
+			xtype: 'button',
+			tooltip: { text: 'Save Program/Machine' },
+			text: 'SAVE',
+			focusCls: '',
+			id: 'saveButton',
+			iconCls: 'save-icon',
+			iconAlign: 'top',
+			width: '80%',
+			flex: 0.6,
+			menu: [
+				{
+					text: 'Program to Text...',
+					iconCls: 'text-icon',
+					id: 'saveTextButton'
+				},
+				{
+					text: 'To Database...',
+					iconCls: 'database-icon',
+					id: 'saveMachineButton'
+				}
+			]
+		},
+		{
+			border: false,
+			flex: 0.2
+		},
+		{
+			xtype: 'button',
+			tooltip: { text: 'Reset the machine' },
+			text: 'RESET',
+			focusCls: '',
+			id: 'resetButton',
+			iconCls: 'reset-icon',
+			iconAlign: 'top',
+			width: '80%',
+			flex: 0.6
+		},
+		{
+			border: false,
+			flex: 0.2
+		},
+		{
+			xtype: 'button',
+			tooltip: { text: 'Launch Assembler Editor' },
+			text: 'ASSEMBLER',
+			focusCls: '',
+			id: 'assemblerButton',
+			iconCls: 'assemble-icon',
+			iconAlign: 'top',
+			width: '80%',
+			flex: 0.6
+		},
+		{
+			border: false,
+			flex: 0.10
+		},
+		{
+			xtype: 'button',
+			tooltip: { text: 'Launch Disassembler' },
+			text: 'DISASSEMBLER',
+			focusCls: '',
+			id: 'disassemblerButton',
+			iconCls: 'disassemble-icon',
+			iconAlign: 'top',
+			width: '80%',
+			flex: 0.6
+		},
+		{
+			border: false,
+			flex: 0.2
+		}
+	]
 });
 
 Ext.define('BDC.lib.MemoryPanel', {
@@ -1392,165 +1443,304 @@ Ext.define('BDC.view.View', {
 });
 
 Ext.define('BDC.controller.Controller', {
-    extend: 'Ext.app.Controller',
-    uses: ['BDC.lib.Programs', 'BDC.lib.AssemblerEditor', 'BDC.lib.Disassembler'],
-    stores: [ 'Machine', 'Memory', 'Disassembly' ],
-    views: [ 'BDC.view.View' ],
-    refs: [
-        { selector: 'bdc-view', ref: 'BDCView' },
-        { selector: 'panel[itemId=bdc-assembler]', ref: 'Assembler' }
-    ],
+	extend: 'Ext.app.Controller',
+	uses: ['BDC.lib.Programs', 'BDC.lib.AssemblerEditor', 'BDC.lib.Disassembler', 'BDC.lib.MachineLoadDialog'],
+	stores: [ 'Machine', 'Memory', 'Disassembly', 'MachineList' ],
+	views: [ 'BDC.view.View' ],
+	refs: [
+		{ selector: 'bdc-view', ref: 'BDCView' },
+		{ selector: 'panel[itemId=bdc-assembler]', ref: 'Assembler' }
+	],
 
-    init: function () {
-        this.control({
-            'bdc-view': {
-                afterrender: this.onReset
-            },
-            '#assemblerButton': {
-                click: this.onAssembler
-            },
-            '#disassemblerButton': {
-                click: this.onDisassembler
-            },
-            '#assembleButton': {
-                click: this.onAssemble
-            },
-            '#resetButton': {
-                click: this.onReset
-            },
-            '#stepButton': {
-                click: this.onStep
-            },
-            '#programOne': {
-                click: this.onProgramOne
-            },
-            '#programTwo': {
-                click: this.onProgramTwo
-            },
-            '#programThree': {
-                click: this.onProgramThree
-            },
-            '#programFour': {
-                click: this.onProgramFour
-            },
-            '#programFive': {
-                click: this.onProgramFive
-            },
-            '#programSix': {
-                click: this.onProgramSix
-            }
-        });
-    },
+	init: function () {
+		this.control({
+			'bdc-view': {
+				afterrender: this.onReset
+			},
+			'#assemblerButton': {
+				click: this.onAssembler
+			},
+			'#disassemblerButton': {
+				click: this.onDisassembler
+			},
+			'#assembleButton': {
+				click: this.onAssemble
+			},
+			'#resetButton': {
+				click: this.onReset
+			},
+			'#stepButton': {
+				click: this.onStep
+			},
+			'#loadTextButton': {
+				click: this.onLoadText
+			},
+			'#loadMachineButton': {
+				click: this.onLoadMachine
+			},
+			'#saveTextButton': {
+				click: this.onSaveText
+			},
+			'#saveMachineButton': {
+				click: this.onSaveMachine
+			},
+			'#programOne': {
+				click: this.onProgramOne
+			},
+			'#programTwo': {
+				click: this.onProgramTwo
+			},
+			'#programThree': {
+				click: this.onProgramThree
+			},
+			'#programFour': {
+				click: this.onProgramFour
+			},
+			'#programFive': {
+				click: this.onProgramFive
+			},
+			'#programSix': {
+				click: this.onProgramSix
+			},
+			'#loadDialog': {
+				loadMachine: this.loadMachine
+			},
+			'#machinesPanel': {
+				deleteMachine: this.deleteMachine
+			}
+		});
+	},
 
-    onLaunch: function () {
-        var memory = this.getMemoryStore();
-        var machine = this.getMachineStore();
-        var disassembly = this.getDisassemblyStore();
+	onLaunch: function () {
+		var memory = this.getMemoryStore();
+		var machine = this.getMachineStore();
+		var disassembly = this.getDisassemblyStore();
 
-        memory.on('update', disassembly.onUpdateMemory, disassembly);
-        memory.on('update', this.onUpdateMemory, this);
+		memory.on('update', disassembly.onUpdateMemory, disassembly);
+		memory.on('update', this.onUpdateMemory, this);
 
-        machine.on('update', this.onUpdateMachine, this);
-        machine.on('dataAccess', this.onDataAccess, this);
-        machine.on('indirectAccess', this.onIndirectAccess, this);
-        machine.on('output', this.onOutput, this);
-    },
+		machine.on('update', this.onUpdateMachine, this);
+		machine.on('dataAccess', this.onDataAccess, this);
+		machine.on('indirectAccess', this.onIndirectAccess, this);
+		machine.on('output', this.onOutput, this);
+	},
 
-    onUpdateMemory: function (store, record, op) {
-        if (op === Ext.data.Model.COMMIT) {
-            this.getBDCView().updateMemory(record);
-        }
-    },
+	onUpdateMemory: function (store, record, op) {
+		if (op === Ext.data.Model.COMMIT) {
+			this.getBDCView().updateMemory(record);
+		}
+	},
 
-    onUpdateMachine: function (store, record, op) {
-        if (op === Ext.data.Model.COMMIT) {
-            this.getBDCView().updateMachine(record);
-        }
-    },
+	onUpdateMachine: function (store, record, op) {
+		if (op === Ext.data.Model.COMMIT) {
+			this.getBDCView().updateMachine(record);
+		}
+	},
 
-    onDataAccess: function (address) {
-        this.getBDCView().dataAccess(address);
-    },
+	onDataAccess: function (address) {
+		this.getBDCView().dataAccess(address);
+	},
 
-    onIndirectAccess: function (address) {
-        this.getBDCView().indirectAccess(address);
-    },
+	onIndirectAccess: function (address) {
+		this.getBDCView().indirectAccess(address);
+	},
 
-    onOutput: function (cell, value) {
-        this.getBDCView().output(cell, value);
-    },
+	onOutput: function (cell, value) {
+		this.getBDCView().output(cell, value);
+	},
 
-    onAssembler: function () {
-        BDC.lib.AssemblerEditor.show();
-    },
+	onAssembler: function () {
+		BDC.lib.AssemblerEditor.show();
+	},
 
-    onDisassembler: function () {
-        BDC.lib.Disassembler.show();
-    },
+	onDisassembler: function () {
+		BDC.lib.Disassembler.show();
+	},
 
-    onAssemble: function () {
-        var memory, message, editor = this.getAssembler();
-        var store = this.getMemoryStore();
+	onAssemble: function () {
+		var memory, message, editor = this.getAssembler();
+		var store = this.getMemoryStore();
 
-        try {
-            memory = editor.assemble();
-        } catch (e) {
-            message = Ext.String.format("Error: {0}, Line: {1}", e.error, e.line_no);
-            Ext.Msg.alert(message);
-            return;
-        }
+		try {
+			memory = editor.assemble();
+		} catch (e) {
+			message = Ext.String.format("Error: {0}, Line: {1}", e.error, e.line_no);
+			Ext.Msg.alert('Error', message);
+			return;
+		}
 
-        this.onReset();
-        store.loadProgram(memory);
-    },
+		this.onReset();
+		store.loadProgram(memory);
+	},
 
-    onReset: function () {
-        var view = this.getBDCView();
-        var memory = this.getMemoryStore();
-        var machine = this.getMachineStore();
+	onReset: function () {
+		var view = this.getBDCView();
+		var memory = this.getMemoryStore();
+		var machine = this.getMachineStore();
 
-        memory.clear();
-        machine.reset();
-        view.reset();
-    },
+		memory.clear();
+		machine.reset();
+		view.reset();
+	},
 
-    onStep: function () {
-        var view = this.getBDCView();
-        var machine = this.getMachineStore();
+	onStep: function () {
+		var view = this.getBDCView();
+		var machine = this.getMachineStore();
 
-        view.setStep();
-        machine.step();
-    },
+		view.setStep();
+		machine.step();
+	},
 
-    onProgramOne: function () {
-        this.loadProgram(BDC.lib.Programs.PROGRAM_ONE);
-    },
+	onLoadText: function () {
+		var i, length;
+		var program = Array.apply(null, new Array(100)).map(Number.prototype.valueOf, 0);
+		var store = this.getMemoryStore();
 
-    onProgramTwo: function () {
-        this.loadProgram(BDC.lib.Programs.PROGRAM_TWO);
-    },
+		Ext.MessageBox.prompt('Load Program', 'Please enter up to 100 digits:', function (buttonId, text) {
+			text = text.replace(/[^0-9]/g, '');	// remove all non-digits
+			if (buttonId === 'ok' && text.length > 0) {
+				length = Math.min(100, text.length);
+				for (i = 0; i < length; ++i) {
+					program[i] = parseInt(text[i]);
+				}
 
-    onProgramThree: function () {
-        this.loadProgram(BDC.lib.Programs.PROGRAM_THREE);
-    },
+				this.onReset();
+				store.loadProgram(program);
+			}
 
-    onProgramFour: function () {
-        this.loadProgram(BDC.lib.Programs.PROGRAM_FOUR);
-    },
+		}, this, true);
+	},
 
-    onProgramFive: function () {
-        this.loadProgram(BDC.lib.Programs.PROGRAM_FIVE);
-    },
+	onLoadMachine: function () {
+		Ext.create('BDC.lib.MachineLoadDialog');
+	},
 
-    onProgramSix: function () {
-        this.loadProgram(BDC.lib.Programs.PROGRAM_SIX);
-    },
+	onSaveText: function () {
+		var store = this.getMemoryStore();
+		var str = '', i;
 
-    loadProgram: function (program) {
-        var machine = this.getMachineStore();
-        this.onReset();
-        machine.loadProgram(program);
-    }
+		for (i = 0; i < 100; ++i) {
+			str = str + store.getCellValue(i).toString();
+		}
+
+		Ext.MessageBox.prompt('Save Program', 'Copy to clipboard:', Ext.emptyFn, this, true, str);
+	},
+
+	onSaveMachine: function () {
+		var machine, memory;
+		var state = {};
+		var result, i;
+
+		Ext.MessageBox.prompt('Save Machine State', 'Please enter a name:', function (buttonId, name) {
+			name = name.trim();
+
+			if (buttonId === 'ok' && name.length > 0) {
+				machine = this.getMachineStore();
+				memory = this.getMemoryStore();
+
+				state.name = name;
+				state.halted = machine.getHalted();
+				state.overflow_flag = machine.getOverflow();
+				state.reg_a = machine.getACC();
+				state.reg_pc = machine.getPC();
+				state.reg_ir = machine.getIR();
+				state.memory = [];
+				for (i = 0; i < 100; ++i) {
+					state.memory[i] = memory.getCellValue(i);
+				}
+
+				Ext.Ajax.request({
+					url: './cgi-bin/save.rb?',
+					method: 'POST',
+					params: { machine: Ext.JSON.encode(state) },
+					success: function () {
+						Ext.Msg.alert('Success', 'Machine saved successfully.');
+					},
+					failure: function (response) {
+						result = Ext.JSON.decode(response.responseText);
+						Ext.Msg.alert('Save Error', result.result);
+					}
+				});
+			}
+		}, this);
+	},
+
+	onProgramOne: function () {
+		this.loadProgram(BDC.lib.Programs.PROGRAM_ONE);
+	},
+
+	onProgramTwo: function () {
+		this.loadProgram(BDC.lib.Programs.PROGRAM_TWO);
+	},
+
+	onProgramThree: function () {
+		this.loadProgram(BDC.lib.Programs.PROGRAM_THREE);
+	},
+
+	onProgramFour: function () {
+		this.loadProgram(BDC.lib.Programs.PROGRAM_FOUR);
+	},
+
+	onProgramFive: function () {
+		this.loadProgram(BDC.lib.Programs.PROGRAM_FIVE);
+	},
+
+	onProgramSix: function () {
+		this.loadProgram(BDC.lib.Programs.PROGRAM_SIX);
+	},
+
+	loadProgram: function (program) {
+		var machine = this.getMachineStore();
+		this.onReset();
+		machine.loadProgram(program);
+	},
+
+	loadMachine: function (model) {
+		var machineStore, memoryStore;
+		var machine, me = this;
+		machineStore = this.getMachineStore();
+		memoryStore = this.getMemoryStore();
+
+		Ext.Ajax.request({
+			url: './cgi-bin/load.rb?',
+			method: 'GET',
+			params: { name: model.get('name') },
+			success: function (response) {
+				me.onReset();
+
+				machine = Ext.JSON.decode(response.responseText);
+
+				machineStore.setHalted(machine.halted);
+				machineStore.setOverflow(machine.overflow_flag);
+				machineStore.setACC(machine.reg_a);
+				machineStore.setPC(machine.reg_pc);
+				machineStore.setIR(machine.reg_ir);
+
+				memoryStore.loadProgram(machine.memory);
+			},
+
+			failure: function (response) {
+				Ext.Msg.alert(response.responseText);
+			}
+		});
+	},
+
+	deleteMachine: function (model) {
+		var result, store = Ext.getStore('MachineList');
+
+		Ext.Ajax.request({
+			url: './cgi-bin/delete.rb?',
+			method: 'DELETE',
+			params: { name: model.get('name') },
+			success: function () {
+				store.reload();
+			},
+			failure: function (response) {
+				result = Ext.JSON.decode(response.responseText);
+				Ext.Msg.alert('Delete Error', result.result);
+			}
+		});
+	}
 });
 
 Ext.define('BDC.lib.Colors', {
@@ -2386,6 +2576,116 @@ Ext.define('BDC.lib.Disassembler', {
 
 
 
+/**
+ * Machine load dialog class
+ */
+Ext.define('BDC.lib.MachineLoadDialog', {
+	extend: 'Ext.window.Window',
+	iconCls: 'database-icon',
+	id: 'loadDialog',
+	modal: true,
+	autoShow: true,
+	width: 400,
+	height: 300,
+	shadow: true,
+	resizable: false,
+	buttonAlign: 'right',
+	title: 'Load Machine',
+	layout: 'fit',
+	items: [
+		{
+			xtype: 'gridpanel',
+			itemId: 'machinesPanel',
+			autoHeight: true,
+			columns: [
+				{
+					text: 'Name',
+					flex: 2,
+					dataIndex: 'name',
+					draggable: false,
+					menuDisabled: true,
+					sortable: true,
+					resizable: true
+				},
+				{
+					text: 'Date',
+					xtype: 'datecolumn',
+					format: 'm-d h:i a',
+					flex: 1,
+					dataIndex: 'date',
+					draggable: false,
+					menuDisabled: true,
+					sortable: true,
+					resizable: true
+				}
+			],
+			listeners: {
+				selectionchange: {
+					fn: function (model, selected) {
+						Ext.ComponentQuery.query('button[itemId=okButton]')[0].setDisabled(!selected.length);
+					},
+					scope: this
+				},
+				itemcontextmenu: function (view, record, item, index, event) {
+					var menu = view.up().up().down('.menu');
+					var position = event.getXY();
+					event.stopEvent();
+					menu.showAt(position);
+				}
+			}
+		},
+		{
+			xtype: 'menu',
+			items: [
+				{
+					text: 'Delete Machine',
+					iconCls: 'delete-icon',
+					handler: function () {
+						var model, grid = Ext.ComponentQuery.query('#machinesPanel')[0];
+						if (grid.getSelectionModel().hasSelection()) {
+							model = grid.getSelectionModel().getSelection()[0];
+							grid.fireEvent('deleteMachine', model);
+						}
+					}
+				}
+			]
+		}
+	],
+	buttons: [
+		{
+			xtype: 'button',
+			text: 'OK',
+			disabled: true,
+			itemId: 'okButton',
+			handler: function () {
+				var me = this, model, dlg = me.up('.window'), machine;
+				var grid = Ext.ComponentQuery.query('#machinesPanel')[0];
+				if (grid.getSelectionModel().hasSelection()) {
+					model = grid.getSelectionModel().getSelection()[0];
+					dlg.fireEvent('loadMachine', model);
+					dlg.close();
+				}
+			}
+		},
+		{
+			xtype: 'button',
+			text: 'Cancel',
+			handler: function () {
+				this.up('.window').close();
+			}
+		}
+	],
+
+	initComponent: function () {
+		var panel, store = Ext.getStore('MachineList');
+
+		this.callParent(arguments);
+
+		panel = this.getComponent('machinesPanel');
+		panel.reconfigure(store);
+		store.load();
+	}
+});
 Ext.define('BDC.lib.Frame', {
     extend: 'Ext.panel.Panel',
     alias: 'bdc-frame',
