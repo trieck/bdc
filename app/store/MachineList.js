@@ -12,7 +12,7 @@ Ext.define('BDC.store.MachineList', {
 
 	proxy: {
 		type: 'ajax',
-		url: 'list.rb',
+		url: './list.rb',
 		reader: {
 			type: 'json',
 			root: 'machines'
