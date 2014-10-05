@@ -57,6 +57,12 @@ Ext.define('BDC.controller.Controller', {
 			},
 			'#programSix': {
 				click: this.onProgramSix
+			},
+			'#loadDialog': {
+				loadMachine: this.loadMachine
+			},
+			'#machinesPanel': {
+				deleteMachine: this.deleteMachine
 			}
 		});
 	},
@@ -162,7 +168,7 @@ Ext.define('BDC.controller.Controller', {
 	},
 
 	onLoadMachine: function () {
-		new BDC.lib.MachineLoadDialog({controller: this});
+		Ext.create('BDC.lib.MachineLoadDialog');
 	},
 
 	onSaveText: function () {
@@ -245,20 +251,50 @@ Ext.define('BDC.controller.Controller', {
 		machine.loadProgram(program);
 	},
 
-	loadMachine: function (machine) {
+	loadMachine: function (model) {
 		var machineStore, memoryStore;
-
+		var machine, me = this;
 		machineStore = this.getMachineStore();
 		memoryStore = this.getMemoryStore();
 
-		this.onReset();
+		Ext.Ajax.request({
+			url: window.location.origin + '/cgi-bin/load.rb?',
+			method: 'GET',
+			params: { name: model.get('name') },
+			success: function (response) {
+				me.onReset();
 
-		machineStore.setHalted(machine.halted);
-		machineStore.setOverflow(machine.overflow_flag);
-		machineStore.setACC(machine.reg_a);
-		machineStore.setPC(machine.reg_pc);
-		machineStore.setIR(machine.reg_ir);
+				machine = Ext.JSON.decode(response.responseText);
 
-		memoryStore.loadProgram(machine.memory);
+				machineStore.setHalted(machine.halted);
+				machineStore.setOverflow(machine.overflow_flag);
+				machineStore.setACC(machine.reg_a);
+				machineStore.setPC(machine.reg_pc);
+				machineStore.setIR(machine.reg_ir);
+
+				memoryStore.loadProgram(machine.memory);
+			},
+
+			failure: function (response) {
+				Ext.Msg.alert(response.responseText);
+			}
+		});
+	},
+
+	deleteMachine: function (model) {
+		var result, store = Ext.getStore('MachineList');
+
+		Ext.Ajax.request({
+			url: window.location.origin + '/cgi-bin/delete.rb?',
+			method: 'DELETE',
+			params: { name: model.get('name') },
+			success: function () {
+				store.reload();
+			},
+			failure: function (response) {
+				result = Ext.JSON.decode(response.responseText);
+				Ext.Msg.alert('Delete Error', result.result);
+			}
+		});
 	}
 });
