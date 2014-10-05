@@ -28,11 +28,17 @@ Ext.define('BDC.controller.Controller', {
 			'#stepButton': {
 				click: this.onStep
 			},
+			'#loadTextButton': {
+				click: this.onLoadText
+			},
 			'#loadMachineButton': {
 				click: this.onLoadMachine
 			},
-			'#saveButton': {
-				click: this.onSave
+			'#saveTextButton': {
+				click: this.onSaveText
+			},
+			'#saveMachineButton': {
+				click: this.onSaveMachine
 			},
 			'#programOne': {
 				click: this.onProgramOne
@@ -135,11 +141,42 @@ Ext.define('BDC.controller.Controller', {
 		machine.step();
 	},
 
-	onLoadMachine: function () {
-		var dialog = new BDC.lib.MachineLoadDialog({controller: this});
+	onLoadText: function () {
+		var i, length;
+		var program = Array.apply(null, new Array(100)).map(Number.prototype.valueOf, 0);
+		var store = this.getMemoryStore();
+
+		Ext.MessageBox.prompt('Load Program', 'Please enter up to 100 digits:', function (buttonId, text) {
+			text = text.replace(/[^0-9]/g, '');	// remove all non-digits
+			if (buttonId === 'ok' && text.length > 0) {
+				length = Math.min(100, text.length);
+				for (i = 0; i < length; ++i) {
+					program[i] = parseInt(text[i]);
+				}
+
+				this.onReset();
+				store.loadProgram(program);
+			}
+
+		}, this, true);
 	},
 
-	onSave: function () {
+	onLoadMachine: function () {
+		new BDC.lib.MachineLoadDialog({controller: this});
+	},
+
+	onSaveText: function () {
+		var store = this.getMemoryStore();
+		var str = '', i;
+
+		for (i = 0; i < 100; ++i) {
+			str = str + store.getCellValue(i).toString();
+		}
+
+		Ext.MessageBox.prompt('Save Program', 'Copy to clipboard:', Ext.emptyFn, this, true, str);
+	},
+
+	onSaveMachine: function () {
 		var machine, memory;
 		var state = {};
 		var result, i;

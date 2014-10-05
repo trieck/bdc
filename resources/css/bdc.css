@@ -39,6 +39,10 @@ body {
     background-image: url(../images/load.png) !important;
 }
 
+.text-icon {
+    background-image: url(../images/text.png) !important;
+}
+
 .memory-col-header {
     font-family: "Menlo", "Courier New", "Courier", monospace;
     font-weight: 900;
