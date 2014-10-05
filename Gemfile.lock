@@ -3,6 +3,7 @@ GEM
     ruby-mysql (2.9.12)
 
 PLATFORMS
+  ruby
   x64-mingw32
 
 DEPENDENCIES
