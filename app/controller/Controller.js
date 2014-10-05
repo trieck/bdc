@@ -136,7 +136,7 @@ Ext.define('BDC.controller.Controller', {
 	},
 
 	onLoadMachine: function () {
-		var dialog = new BDC.lib.MachineLoadDialog();
+		var dialog = new BDC.lib.MachineLoadDialog({controller: this});
 	},
 
 	onSave: function () {
@@ -206,5 +206,22 @@ Ext.define('BDC.controller.Controller', {
 		var machine = this.getMachineStore();
 		this.onReset();
 		machine.loadProgram(program);
+	},
+
+	loadMachine: function (machine) {
+		var machineStore, memoryStore;
+
+		machineStore = this.getMachineStore();
+		memoryStore = this.getMemoryStore();
+
+		this.onReset();
+
+		machineStore.setHalted(machine.halted);
+		machineStore.setOverflow(machine.overflow_flag);
+		machineStore.setACC(machine.reg_a);
+		machineStore.setPC(machine.reg_pc);
+		machineStore.setIR(machine.reg_ir);
+
+		memoryStore.loadProgram(machine.memory);
 	}
 });

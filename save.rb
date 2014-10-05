@@ -12,7 +12,9 @@ begin
 
   machine = cgi['machine']
   parsed = JSON.parse(machine)
-  name = parsed['name']
+
+  name = Mysql.escape_string(parsed['name'])
+  machine = Mysql.escape_string(machine)
 
   statement = "INSERT INTO machines (name, data, created_at, updated_at) VALUES ('#{name}', '#{machine}', NOW(), NOW());"
   conn.query(statement)

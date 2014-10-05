@@ -39,14 +39,44 @@ Ext.define('BDC.lib.MachineLoadDialog', {
 					sortable: true,
 					resizable: true
 				}
-			]
+			],
+			listeners: {
+				selectionchange: {
+					fn: function (model, selected) {
+						model.view.up().up().down('button[itemId=okButton]').setDisabled(!selected.length);
+					},
+					scope: this
+				}
+			}
 		}
 	], buttons: [
 		{
 			xtype: 'button',
 			text: 'OK',
+			disabled: true,
+			itemId: 'okButton',
 			handler: function () {
-				this.up('.window').close();
+				var me = this, model, dlg, machine;
+				var grid = me.up().up().down('gridpanel');
+				if (grid.getSelectionModel().hasSelection()) {
+					model = grid.getSelectionModel().getSelection()[0];
+
+					Ext.Ajax.request({
+						url: window.location.origin + '/load.rb?',
+						method: 'GET',
+						params: { name: model.get('name') },
+						success: function (response) {
+							dlg = me.up('.window');
+							machine = Ext.JSON.decode(response.responseText);
+							dlg.controller.loadMachine(machine);
+							dlg.close();
+						},
+
+						failure: function (response) {
+							Ext.Msg.alert(response.responseText);
+						}
+					});
+				}
 			}
 		},
 		{
