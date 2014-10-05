@@ -80,26 +80,12 @@ Ext.define('BDC.lib.MachineLoadDialog', {
 			disabled: true,
 			itemId: 'okButton',
 			handler: function () {
-				var me = this, model, dlg, machine;
+				var me = this, model, dlg = me.up('.window'), machine;
 				var grid = Ext.ComponentQuery.query('#machinesPanel')[0];
 				if (grid.getSelectionModel().hasSelection()) {
 					model = grid.getSelectionModel().getSelection()[0];
-
-					Ext.Ajax.request({
-						url: window.location.origin + '/cgi-bin/load.rb?',
-						method: 'GET',
-						params: { name: model.get('name') },
-						success: function (response) {
-							dlg = me.up('.window');
-							machine = Ext.JSON.decode(response.responseText);
-							dlg.fireEvent('loadMachine', machine);
-							dlg.close();
-						},
-
-						failure: function (response) {
-							Ext.Msg.alert(response.responseText);
-						}
-					});
+					dlg.fireEvent('loadMachine', model);
+					dlg.close();
 				}
 			}
 		},
