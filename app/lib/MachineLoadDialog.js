@@ -62,7 +62,7 @@ Ext.define('BDC.lib.MachineLoadDialog', {
 					model = grid.getSelectionModel().getSelection()[0];
 
 					Ext.Ajax.request({
-						url: window.location.origin + '/load.rb?',
+						url: window.location.origin + '/cgi-bin/load.rb?',
 						method: 'GET',
 						params: { name: model.get('name') },
 						success: function (response) {

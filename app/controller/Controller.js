@@ -163,7 +163,7 @@ Ext.define('BDC.controller.Controller', {
 				}
 
 				Ext.Ajax.request({
-					url: window.location.origin + '/save.rb?',
+					url: window.location.origin + '/cgi-bin/save.rb?',
 					method: 'POST',
 					params: { machine: Ext.JSON.encode(state) },
 					success: function () {
