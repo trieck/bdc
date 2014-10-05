@@ -1,4 +1,4 @@
-#!/Ruby21-x64/bin/ruby
+#!/usr/bin/ruby
 
 require 'cgi'
 require 'mysql'
@@ -19,7 +19,7 @@ begin
 rescue Mysql::Error
   status = 'SERVER_ERROR'
 ensure
-  conn.close
+  conn.close unless conn.nil?
   cgi.out(
       'type' => 'application/json',
       'status' => status
